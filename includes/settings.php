@@ -105,8 +105,8 @@ function bp_multiblog_mode_admin_setting_callback_general_section() { /* Nothing
  */
 function bp_multiblog_mode_admin_setting_callback_sites() {
 
-	// Get sites of the current network
-	$sites = get_sites( array( 'network_id' => get_network()->id ) ); ?>
+	// Get all sites of the current network
+	$sites = bp_multiblog_mode_get_sites(); ?>
 
 	<p><?php esc_html_e( 'Select the network sites that should have Multiblog enabled.', 'bp-multiblog-mode' ); ?></p>
 

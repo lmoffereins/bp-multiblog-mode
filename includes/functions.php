@@ -65,10 +65,37 @@ function bp_multiblog_mode_is_enabled( $site_id = 0 ) {
 	// Define return value
 	$retval = false;
 
-	// Enable when BP is network activated, but not when we're on the real root blog or the network admin
-	if ( bp_is_network_activated() && ! bp_multiblog_mode_is_root_blog() && ! is_network_admin() ) {
-		$retval = get_option( '_bp_multiblog_mode_enabled', false );
+	// Enable when BP is network activated, but not when we're on the real root blog
+	if ( bp_is_network_activated() && ! bp_multiblog_mode_is_root_blog( $site_id ) ) {
+		$retval = get_blog_option( $site_id, '_bp_multiblog_mode_enabled', false );
 	}
 
 	return $retval;
+}
+
+/**
+ * Return the sites of the current network
+ *
+ * @since 1.0.0
+ *
+ * @param bool $enabled Optional. Whether to return only enabled sites. Defaults to false.
+ * @return array Sites, maybe only enabled
+ */
+function bp_multiblog_mode_get_sites( $enabled = false ) {
+
+	// Get the Network's sites
+	$sites = get_sites( array( 'network_id' => get_network()->id ) );
+
+	// Filter for enabled sites
+	if ( $enabled ) {
+		foreach ( $sites as $k => $site ) {
+			
+			// Remove the unenabled site
+			if ( ! bp_multiblog_mode_is_enabled( $site->id ) ) {
+				unset( $sites[ $k ] );
+			}
+		}
+	}
+
+	return $sites;
 }
