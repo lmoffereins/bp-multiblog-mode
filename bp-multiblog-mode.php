@@ -146,14 +146,17 @@ final class BP_Multiblog_Mode {
 	/**
 	 * Return whether the plugin logic can be run
 	 *
-	 * Checks whether BP is network activated and BP_ENABLE_MULTIBLOG is not true.
+	 * Checks whether:
+	 * - BP is network activated
+	 * - BP_ENABLE_MULTIBLOG is not set or true
+	 * - there are multiple sites in the network
 	 *
 	 * @since 1.0.0
 	 *
 	 * @return bool Can we do Multiblog?
 	 */
 	public function do_multiblog() {
-		return bp_is_network_activated() && ( ! defined( 'BP_ENABLE_MULTIBLOG' ) || ! BP_ENABLE_MULTIBLOG );
+		return bp_is_network_activated() && ( ! defined( 'BP_ENABLE_MULTIBLOG' ) || ! BP_ENABLE_MULTIBLOG ) && 1 < (int) get_blog_count();
 	}
 
 	/**
