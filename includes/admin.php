@@ -61,6 +61,11 @@ class BP_Multiblog_Mode_Admin {
 		// Settings
 		add_action( 'bp_admin_init',    array( $this, 'register_settings'      )        );
 		add_filter( 'bp_map_meta_caps', array( $this, 'map_settings_meta_caps' ), 10, 4 );
+
+		// XProfile
+		add_action( 'xprofile_group_after_submitbox', array( $this, 'xprofile_group_sites_metabox' ) );
+		add_action( 'xprofile_group_after_save',      array( $this, 'xprofile_save_group_sites'    ) );
+		add_action( 'xprofile_admin_group_action',    array( $this, 'xprofile_group_admin_label'   ) );
 	}
 
 	/** Admin Page ******************************************************/
@@ -131,21 +136,35 @@ class BP_Multiblog_Mode_Admin {
 
 		// Define local variable(s)
 		$styles = array();
+		$screen = get_current_screen();
 
 		// Network admin page
-		if ( get_current_screen()->id === $this->screen_id ) {
+		if ( $screen->id === $this->screen_id ) {
 
 			// Mimic post inline-edit styles for .cat-checklist
 			$styles[] = '.form-table p + .cat-checklist { margin-top: 6px; }';
 			$styles[] = '.form-table .cat-checklist li, .form-table .cat-checklist input { margin: 0; position: relative; }';
 			$styles[] = '.form-table .cat-checklist label { margin: .5em 0; display: block; }';
 			$styles[] = '.form-table .cat-checklist input[type="checkbox"] { vertical-align: middle; }';
-			$styles[] = '.form-table .cat-checklist .description { padding-left: 21px; display: block; opacity: .7; }';
+			$styles[] = '.form-table .cat-checklist label .description { padding-left: 21px; display: block; opacity: .7; }';
 
 			// Small screens
 			$styles[] = '@media screen and (max-width: 782px) {';
 			$styles[] = '.form-table .cat-checklist label { max-width: none; float: none; margin: 1em 0; font-size: 16px; }';
-			$styles[] = '.form-table .cat-checklist .description { padding: 0 0 0 30px; }';
+			$styles[] = '.form-table .cat-checklist label .description { padding: 0 0 0 30px; }';
+			$styles[] = '}';
+
+		// BP XProfile group edit page
+		} elseif ( 'users_page_bp-profile-setup' === $screen->id && isset( $_GET['mode'] ) && in_array( $_GET['mode'], array( 'add_group', 'edit_group' ) ) ) {
+
+			// Sites metabox
+			$styles[] = '#bp-multiblog-mode_sitediv label { margin: .5em 0; display: block; }';
+			$styles[] = '#bp-multiblog-mode_sitediv label .description { padding-left: 25px; display: block; opacity: .7; }';
+
+			// Small screens
+			$styles[] = '@media screen and (max-width: 782px) {';
+			$styles[] = '#bp-multiblog-mode_sitediv label { max-width: none; float: none; margin: 1em 0; font-size: 16px; }';
+			$styles[] = '#bp-multiblog-mode_sitediv label .description { padding: 0 0 0 34px; }';
 			$styles[] = '}';
 		}
 
@@ -230,6 +249,156 @@ class BP_Multiblog_Mode_Admin {
 		}
 
 		return $caps;
+	}
+
+	/** XProfile ********************************************************/
+
+	/**
+	 * Add XProfile field group Sites metabox
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param BP_XProfile_Group $group
+	 */
+	public function xprofile_group_sites_metabox( $group ) {
+
+		// The primary field group is for all, so bail
+		if ( 1 === (int) $group->id )
+			return;
+
+		// Bail when no sites are Multiblog enabled
+		if ( ! $sites = bp_multiblog_mode_get_enabled_sites() )
+			return;
+
+		// Prepend the root site
+		array_unshift( $sites, get_site( bp_multiblog_mode_get_root_blog_id() ) );
+
+		// Get the group's sites
+		$group_sites = bp_multiblog_mode_xprofile_get_group_sites( $group->id );
+
+		?>
+
+		<div id="bp-multiblog-mode_sitediv" class="postbox">
+			<h2><?php _e( 'Sites', 'bp-multiblog-mode' ); ?></h2>
+			<div class="inside">
+				<p class="description"><?php _e( 'This group should be available at:', 'bp-multiblog-mode' ); ?></p>
+
+				<ul>
+					<?php foreach ( $sites as $site ) : ?>
+					<li>
+						<label for="group-site-<?php echo $site->id; ?>">
+							<input name="group-sites[]" id="group-site-<?php echo $site->id; ?>" class="group-site-selector" type="checkbox" value="<?php echo $site->id; ?>" <?php checked( in_array( $site->id, $group_sites ) ); ?>/>
+							<?php echo $site->blogname; ?>
+
+							<?php if ( is_main_site( $site->id ) ) : ?>
+								<strong>&mdash; <?php esc_html_e( 'Main Site', 'bp-multiblog-mode' ); ?></strong>
+							<?php endif; ?>
+
+							<span class="description"><?php echo $site->siteurl; ?></span>
+						</label>
+					</li>
+					<?php endforeach; ?>
+				</ul>
+				<p class="description member-type-none-notice<?php if ( ! empty( $group_sites ) ) : ?> hide<?php endif; ?>"><?php _e( 'Unavailable to all sites.', 'bp-multiblog-mode' ) ?></p>
+			</div>
+
+			<input type="hidden" name="has-group-sites" value="1" />
+		</div>
+
+		<?php
+	}
+
+	/**
+	 * Save the XProfile field group's Multiblog sites
+	 * 
+	 * @see BP_XProfile_Field::set_member_types()
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param BP_XProfile_Group $group
+	 */
+	public function xprofile_save_group_sites( $group ) {
+
+		// Bail when sites were not posted
+		if ( ! isset( $_POST['has-group-sites'] ) )
+			return;
+
+		$group_sites = array();
+		if ( isset( $_POST['group-sites'] ) ) {
+			$group_sites = array_map( 'intval', (array) $_POST['group-sites'] );
+		}
+
+		// Delete all previous meta
+		bp_xprofile_delete_meta( $group->id, 'group', 'multiblog_site' );
+
+		/*
+		 * We interpret an empty array as disassociating the group from all sites. This is
+		 * represented internally with the '_none' flag.
+		 */
+		if ( empty( $group_sites ) ) {
+			bp_xprofile_add_meta( $group->id, 'group', 'multiblog_site', '_none' );
+		}
+
+		/*
+		 * Unrestricted groups are represented in the database as having no 'multiblog_site'.
+		 * We detect whether a group is being set to unrestricted by checking whether the
+		 * list of sites passed to the method is the same as the list of available sites,
+		 * plus the root blog.
+		 */
+		$sites   = bp_multiblog_mode_get_enabled_sites( array( 'fields' => 'ids' ) );
+		$sites[] = bp_multiblog_mode_get_root_blog_id();
+
+		sort( $group_sites );
+		sort( $sites );
+
+		// Only save if this is a restricted group
+		if ( $sites !== $group_sites ) {
+			// Save new sites.
+			foreach ( $group_sites as $site_id ) {
+				bp_xprofile_add_meta( $group->id, 'group', 'multiblog_site', $site_id );
+			}
+		}
+	}
+
+	/**
+	 * Display a label representing the XProfile group's sites
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param BP_XProfile_Group $group
+	 */
+	public function xprofile_group_admin_label( $group ) {
+
+		// The primary field group is for all, so bail
+		if ( 1 === (int) $group->id )
+			return;
+
+		// Get all sites and the group's sites
+		$sites       = bp_multiblog_mode_get_enabled_sites( array( 'fields' => 'ids' ) );
+		$sites[]     = bp_multiblog_mode_get_root_blog_id();
+		$group_sites = bp_multiblog_mode_xprofile_get_group_sites( $group->id );
+
+		// Bail when the group applies to all sites
+		if ( array_values( $sites ) == $group_sites )
+			return;
+
+		$label = '';
+		if ( ! empty( $group_sites ) ) {
+			$count = count( $group_sites );
+
+			if ( 1 === $count ) {
+				$site_id    = reset( $group_sites );
+				$label_text = sprintf( __( 'Site: %s', 'bp-multiblog-mode' ), get_blog_option( $site_id, 'blogname' ) );
+			} else {
+				$label_text = sprintf( __( 'For %d Sites', 'bp-multiblog-mode' ), $count );
+			}
+
+			$label = '<div class="button group-site" disabled="disabled">' . $label_text . '</div>';
+		} else {
+			$label = '<div class="button group-site-error" disabled="disabled">' . __( 'Unavailable to all sites', 'bp-multiblog-mode' ) . '</div>';
+		}
+
+		echo $label;
 	}
 }
 

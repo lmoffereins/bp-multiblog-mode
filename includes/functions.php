@@ -129,3 +129,77 @@ function bp_multiblog_mode_get_enabled_sites( $args = array() ) {
 	$args = wp_parse_args( $args, array( 'multiblog' => true ) );
 	return bp_multiblog_mode_get_sites( $args );
 }
+
+/** XProfile ************************************************************/
+
+/**
+ * Return the XProfile field group's Multiblog sites
+ *
+ * @see BP_XProfile_Field::get_member_types()
+ *
+ * @since 1.0.0
+ *
+ * @param int $group_id XProfile group id
+ * @return array Site ids
+ */
+function bp_multiblog_mode_xprofile_get_group_sites( $group_id ) {
+
+	// Get profile group meta
+	$raw_sites = bp_xprofile_get_meta( $group_id, 'group', 'multiblog_site', false );
+
+	// If `$raw_sites` is not an array, it probably means this is a new group (id=0).
+	if ( ! is_array( $raw_sites ) ) {
+		$raw_sites = array();
+	}
+
+	// If '_none' is found in the array, it overrides all sites.
+	$sites = array();
+	if ( ! in_array( '_none', $raw_sites ) ) {
+		$enabled_sites = bp_multiblog_mode_get_enabled_sites( array( 'fields' => 'ids' ) );
+
+		// Eliminate invalid sites saved in the database.
+		foreach ( $raw_sites as $raw_site ) {
+			// The root blog is a special case - it cannot be Multiblog enabled
+			if ( bp_multiblog_mode_is_root_blog( $raw_site ) || in_array( $raw_site, $enabled_sites ) ) {
+				$sites[] = $raw_site;
+			}
+		}
+
+		// If no sites have been saved, intepret as *all* sites.
+		if ( empty( $sites ) ) {
+			$sites = array_values( $enabled_sites );
+
+			// + the root blog
+			$sites[] = bp_multiblog_mode_get_root_blog_id();
+		}
+	}
+
+	return $sites;
+}
+
+/**
+ * Modify the profile groups collection
+ *
+ * @since 1.0.0
+ *
+ * @param array $groups Profile groups
+ * @param array $args Query arguments
+ * @return array Profile groups
+ */
+function bp_multiblog_mode_xprofile_get_groups( $groups, $args ) {
+
+	// Not when editing profile fields
+	if ( ! is_admin() || 'users_page_bp-profile-setup' !== get_current_screen()->id ) {
+
+		// Eliminate unassigned groups for the current site
+		foreach ( $groups as $k => $group ) {
+			if ( ! in_array( get_current_blog_id(), bp_multiblog_mode_xprofile_get_group_sites( $group->id ) ) ) {
+				unset( $groups[ $k ] );
+			}
+		}
+
+		$groups = array_values( $groups );
+	}
+
+	return $groups;
+}

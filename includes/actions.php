@@ -10,6 +10,10 @@
 // Exit if accessed directly
 defined( 'ABSPATH' ) || exit;
 
+/** XProfile ************************************************************/
+
+add_filter( 'bp_xprofile_get_groups', 'bp_multiblog_mode_xprofile_get_groups', 10, 2 );
+
 /** Admin ***************************************************************/
 
 if ( is_admin() ) {
