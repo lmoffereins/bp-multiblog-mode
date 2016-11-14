@@ -72,8 +72,8 @@ class BP_Multiblog_Mode_Admin {
 	 */
 	public function admin_menus() {
 
-		// Bail when user cannot manage options
-		if ( ! bp_current_user_can( 'manage_options' ) )
+		// Bail when user cannot manage
+		if ( ! bp_current_user_can( $this->minimum_capability ) )
 			return;
 
 		// Core settings page
