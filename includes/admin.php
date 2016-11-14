@@ -142,6 +142,7 @@ class BP_Multiblog_Mode_Admin {
 		if ( $screen->id === $this->screen_id ) {
 
 			// Mimic post inline-edit styles for .cat-checklist
+			$styles[] = '.form-table .cat-checklist { padding: 0 9px; }';
 			$styles[] = '.form-table p + .cat-checklist { margin-top: 6px; }';
 			$styles[] = '.form-table .cat-checklist li, .form-table .cat-checklist input { margin: 0; position: relative; }';
 			$styles[] = '.form-table .cat-checklist label { margin: .5em 0; display: block; }';
@@ -154,18 +155,26 @@ class BP_Multiblog_Mode_Admin {
 			$styles[] = '.form-table .cat-checklist label .description { padding: 0 0 0 30px; }';
 			$styles[] = '}';
 
-		// BP XProfile group edit page
-		} elseif ( 'users_page_bp-profile-setup' === $screen->id && isset( $_GET['mode'] ) && in_array( $_GET['mode'], array( 'add_group', 'edit_group' ) ) ) {
+		// BP XProfile admin page
+		} elseif ( 'users_page_bp-profile-setup' === $screen->id ) {
 
-			// Sites metabox
-			$styles[] = '#bp-multiblog-mode_sitediv label { margin: .5em 0; display: block; }';
-			$styles[] = '#bp-multiblog-mode_sitediv label .description { padding-left: 25px; display: block; opacity: .7; }';
+			// Group detail
+			$styles[] = '.wp-core-ui .tab-toolbar .button.group-sites { color: #555 !important; }';
+			$styles[] = '.wp-core-ui .tab-toolbar .button.group-sites-error { color: #f00 !important; border-color: #f00 !important; }';
 
-			// Small screens
-			$styles[] = '@media screen and (max-width: 782px) {';
-			$styles[] = '#bp-multiblog-mode_sitediv label { max-width: none; float: none; margin: 1em 0; font-size: 16px; }';
-			$styles[] = '#bp-multiblog-mode_sitediv label .description { padding: 0 0 0 34px; }';
-			$styles[] = '}';
+			// Add/edit group
+			if ( isset( $_GET['mode'] ) && in_array( $_GET['mode'], array( 'add_group', 'edit_group' ) ) ) {
+
+				// Sites metabox
+				$styles[] = '#bp-multiblog-mode_sitediv label { margin: .5em 0; display: block; }';
+				$styles[] = '#bp-multiblog-mode_sitediv label .description { padding-left: 25px; display: block; opacity: .7; }';
+
+				// Small screens
+				$styles[] = '@media screen and (max-width: 782px) {';
+				$styles[] = '#bp-multiblog-mode_sitediv label { max-width: none; float: none; margin: 1em 0; font-size: 16px; }';
+				$styles[] = '#bp-multiblog-mode_sitediv label .description { padding: 0 0 0 34px; }';
+				$styles[] = '}';
+			}
 		}
 
 		if ( ! empty( $styles ) ) {
@@ -393,9 +402,9 @@ class BP_Multiblog_Mode_Admin {
 				$label_text = sprintf( __( 'For %d Sites', 'bp-multiblog-mode' ), $count );
 			}
 
-			$label = '<div class="button group-site" disabled="disabled">' . $label_text . '</div>';
+			$label = '<div class="button group-sites" disabled="disabled">' . $label_text . '</div>';
 		} else {
-			$label = '<div class="button group-site-error" disabled="disabled">' . __( 'Unavailable to all sites', 'bp-multiblog-mode' ) . '</div>';
+			$label = '<div class="button group-sites-error" disabled="disabled">' . __( 'Unavailable to all sites', 'bp-multiblog-mode' ) . '</div>';
 		}
 
 		echo $label;
