@@ -36,10 +36,10 @@ class BP_Multiblog_Mode_Admin {
 	private function setup_globals() {
 		$this->settings_page      = bp_core_do_network_admin() ? 'settings.php' : 'options-general.php';
 		$this->minimum_capability = bp_core_do_network_admin() ? 'manage_network_options' : 'manage_options';
-		$this->screen_id          = 'settings_page_bp-multiblog-mode';
+		$this->plugin_screen_id   = 'settings_page_bp-multiblog-mode';
 
 		if ( is_network_admin() ) {
-			$this->screen_id .= '-network';
+			$this->plugin_screen_id .= '-network';
 		}
 	}
 
@@ -135,11 +135,12 @@ class BP_Multiblog_Mode_Admin {
 	public function enqueue_scripts() {
 
 		// Define local variable(s)
-		$styles = array();
-		$screen = get_current_screen();
+		$styles  = array();
+		$screen  = get_current_screen();
+		$network = is_network_admin() ? '-network' : '';
 
 		// Network admin page
-		if ( $screen->id === $this->screen_id ) {
+		if ( $screen->id === $this->plugin_screen_id ) {
 
 			// Mimic post inline-edit styles for .cat-checklist
 			$styles[] = '.form-table .cat-checklist { padding: 0 9px; }';
@@ -156,7 +157,7 @@ class BP_Multiblog_Mode_Admin {
 			$styles[] = '}';
 
 		// BP XProfile admin page
-		} elseif ( 'users_page_bp-profile-setup' === $screen->id ) {
+		} elseif ( "users_page_bp-profile-setup{$network}" === $screen->id ) {
 
 			// Group detail
 			$styles[] = '.wp-core-ui .tab-toolbar .button.group-sites { color: #555 !important; }';

@@ -188,8 +188,11 @@ function bp_multiblog_mode_xprofile_get_group_sites( $group_id ) {
  */
 function bp_multiblog_mode_xprofile_get_groups( $groups, $args ) {
 
+	// Are we in the network admin?
+	$network = is_network_admin() ? '-network' : '';
+
 	// Not when editing profile fields
-	if ( ! is_admin() || 'users_page_bp-profile-setup' !== get_current_screen()->id ) {
+	if ( ! is_admin() || "users_page_bp-profile-setup{$network}" !== get_current_screen()->id ) {
 
 		// Eliminate unassigned groups for the current site
 		foreach ( $groups as $k => $group ) {
