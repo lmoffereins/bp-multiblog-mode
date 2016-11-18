@@ -106,7 +106,8 @@ final class BP_Multiblog_Mode {
 	private function includes() {
 
 		// Core
-		require( $this->includes_dir . 'functions.php' );
+		require( $this->includes_dir . 'functions.php'   );
+		require( $this->includes_dir . 'sub-actions.php' );
 
 		// Admin
 		if ( is_admin() ) {
