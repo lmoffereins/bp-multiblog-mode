@@ -151,7 +151,7 @@ function bp_multiblog_mode_admin_setting_callback_sites() {
 function bp_multiblog_mode_admin_settings_page() {
 
 	// Like BP, let's save our own options, until the WP Settings API is updated to work with Multisite.
-	$form_action   = add_query_arg( 'page', 'bp-multiblog-mode', bp_get_admin_url( 'admin.php' ) );
+	$form_action   = is_network_admin() ? add_query_arg( 'page', 'bp-multiblog-mode', bp_get_admin_url( 'admin.php' ) ) : 'options.php';
 	$settings_page = is_network_admin() ? 'bp-multiblog-mode-network' : 'bp-multiblog-mode';
 
 	?>
@@ -190,7 +190,7 @@ function bp_multiblog_mode_admin_settings_save() {
 
 	// Core settings are submitted
 	if ( is_network_admin() && isset( $_GET['page'] ) && 'bp-multiblog-mode' == $_GET['page'] && !empty( $_POST['submit'] ) ) {
-		check_admin_referer( 'bp-multiblog-mode-options' );
+		check_admin_referer( 'bp-multiblog-mode-network-options' );
 
 		// Save whether Sites are enabled
 		if ( isset( $_POST['bp_multiblog_mode_site_ids'] ) ) {
