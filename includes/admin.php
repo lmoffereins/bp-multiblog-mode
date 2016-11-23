@@ -34,13 +34,10 @@ class BP_Multiblog_Mode_Admin {
 	 * @since 1.0.0
 	 */
 	private function setup_globals() {
-		$this->settings_page      = bp_core_do_network_admin() ? 'settings.php' : 'options-general.php';
+		$this->parent_page        = bp_core_do_network_admin() ? 'settings.php' : 'options-general.php';
+		$this->settings_page      = is_network_admin() ? 'bp-multiblog-mode-network' : 'bp-multiblog-mode';
 		$this->minimum_capability = bp_core_do_network_admin() ? 'manage_network_options' : 'manage_options';
-		$this->plugin_screen_id   = 'settings_page_bp-multiblog-mode';
-
-		if ( is_network_admin() ) {
-			$this->plugin_screen_id .= '-network';
-		}
+		$this->plugin_screen_id   = 'settings_page_' . $this->settings_page;
 	}
 
 	/**
@@ -81,9 +78,13 @@ class BP_Multiblog_Mode_Admin {
 		if ( ! bp_current_user_can( $this->minimum_capability ) )
 			return;
 
+		// Bail when the page has no settings
+		if ( ! bp_multiblog_mode_admin_page_has_settings( $this->settings_page ) )
+			return;
+
 		// Core settings page
 		$hook = add_submenu_page(
-			$this->settings_page,
+			$this->parent_page,
 			__( 'BuddyPress Multiblog', 'bp-multiblog-mode' ),
 			__( 'Multiblog', 'bp-multiblog-mode' ),
 			$this->minimum_capability,
@@ -103,7 +104,7 @@ class BP_Multiblog_Mode_Admin {
 	 * @since 1.0.0
 	 */
 	public function admin_head() {
-		remove_submenu_page( $this->settings_page, 'bp-multiblog-mode' );
+		remove_submenu_page( $this->parent_page, 'bp-multiblog-mode' );
 	}
 
 	/**
@@ -116,11 +117,13 @@ class BP_Multiblog_Mode_Admin {
 	 */
 	public function admin_tabs( $tabs ) {
 
-		// Append Multiblog Mode page tab
-		$tabs[] = array(
-			'href' => bp_get_admin_url( add_query_arg( array( 'page' => 'bp-multiblog-mode' ), 'admin.php' ) ),
-			'name' => __( 'Multiblog', 'bp-multiblog-mode' ),
-		);
+		// Append Multiblog Mode page tab, when settings are registered
+		if ( bp_multiblog_mode_admin_page_has_settings( $this->settings_page ) ) {
+			$tabs[] = array(
+				'href' => bp_get_admin_url( add_query_arg( array( 'page' => 'bp-multiblog-mode' ), 'admin.php' ) ),
+				'name' => __( 'Multiblog', 'bp-multiblog-mode' ),
+			);
+		}
 
 		return $tabs;
 	}

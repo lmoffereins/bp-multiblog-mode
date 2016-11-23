@@ -79,7 +79,7 @@ function bp_multiblog_mode_admin_get_settings_fields() {
  */
 function bp_multiblog_mode_admin_get_settings_fields_for_section( $section_id = '' ) {
 
-	// Bail if section is empty
+	// Bail when section is empty
 	if ( empty( $section_id ) )
 		return false;
 
@@ -87,6 +87,34 @@ function bp_multiblog_mode_admin_get_settings_fields_for_section( $section_id = 
 	$retval = isset( $fields[$section_id] ) ? $fields[$section_id] : false;
 
 	return $retval;
+}
+
+/**
+ * Return whether the admin page has registered settings
+ *
+ * @since 1.0.0
+ *
+ * @param string $page
+ * @return bool Does the admin page have settings?
+ */
+function bp_multiblog_mode_admin_page_has_settings( $page = '' ) {
+
+	// Bail when page is empty
+	if ( empty( $page ) )
+		return false;
+
+	// Loop through the available sections
+	$sections = wp_list_filter( bp_multiblog_mode_admin_get_settings_sections(), array( 'page' => $page ) );
+	foreach ( (array) $sections as $section_id => $section ) {
+
+		// Find out whether the section has fields
+		$fields = bp_multiblog_mode_admin_get_settings_fields_for_section( $section_id );
+		if ( ! empty( $fields ) ) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /** General Network Section ***************************************************/
@@ -154,7 +182,7 @@ function bp_multiblog_mode_admin_settings_page() {
 
 	// Like BP, let's save our own options, until the WP Settings API is updated to work with Multisite.
 	$form_action   = is_network_admin() ? add_query_arg( 'page', 'bp-multiblog-mode', bp_get_admin_url( 'admin.php' ) ) : 'options.php';
-	$settings_page = is_network_admin() ? 'bp-multiblog-mode-network' : 'bp-multiblog-mode';
+	$settings_page = bp_multiblog_mode()->admin->settings_page;
 
 	?>
 
