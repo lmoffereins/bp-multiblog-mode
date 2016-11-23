@@ -113,14 +113,16 @@ function bp_multiblog_mode_admin_setting_callback_sites() {
 	<ul class="cat-checklist">
 
 		<?php foreach ( $sites as $site ) :
-			$is_main_site = is_main_site( $site->id ); ?>
+			$is_root_blog = bp_multiblog_mode_is_root_blog( $site->id ); ?>
 
 		<li id="site-<?php echo esc_attr( $site->id ); ?>">
 			<label class="selectit">
-				<input value="<?php echo $site->id; ?>" type="checkbox" name="bp_multiblog_mode_sites[]" id="enabled-site-<?php echo esc_attr( $site->id ); ?>" <?php disabled( $is_main_site ); checked( get_blog_option( $site->id, '_bp_multiblog_mode_enabled', false ) ); ?> />
+				<input value="<?php echo $site->id; ?>" type="checkbox" name="bp_multiblog_mode_sites[]" id="enabled-site-<?php echo esc_attr( $site->id ); ?>" <?php disabled( $is_root_blog ); checked( get_blog_option( $site->id, '_bp_multiblog_mode_enabled', false ) || $is_root_blog ); ?> />
 				<?php echo $site->blogname; ?>
 
-				<?php if ( $is_main_site ) : ?>
+				<?php if ( $is_root_blog && ! is_main_site( $site->id ) ) : ?>
+					<strong>&mdash; <?php esc_html_e( 'BuddyPress Root Site', 'bp-multiblog-mode' ); ?></strong>
+				<?php elseif ( is_main_site( $site->id ) ) : ?>
 					<strong>&mdash; <?php esc_html_e( 'Main Site', 'bp-multiblog-mode' ); ?></strong>
 				<?php endif; ?>
 
