@@ -146,6 +146,17 @@ function bp_multiblog_mode_get_enabled_sites( $args = array() ) {
 function bp_multiblog_mode_activity_limit_stream( $where, $args ) {
 	global $wpdb;
 
+	// Get BuddyPress
+	$bp = buddypress();
+
+	// Only when Multiblog is enabled
+	if ( bp_multiblog_mode_is_enabled() ) {
+
+		// Exclude activity items from deactivated components, not Blogs
+		$components = array_diff( (array) $bp->deactivated_components, array( 'blogs' ) );
+		$where['bp_multiblog_mode_deactivated_components'] = sprintf( "a.component NOT IN ( %s )", "'" . implode( "','", $components ) . "'" );
+	}
+
 	// Force return activity items belonging only to the current site
 	if ( bp_get_option( '_bp_multiblog_mode_activity_stream', false ) ) {
 
