@@ -66,6 +66,18 @@ function bp_multiblog_mode_admin_get_settings_fields() {
 		'bp_multiblog_mode_settings_general' => array(),
 	);
 
+	// Activity
+	if ( bp_is_active( 'activity' ) ) {
+
+		// Activity Stream
+		$fields['bp_multiblog_mode_settings_general']['_bp_multiblog_mode_activity_stream'] = array(
+			'title'             => esc_html__( 'Activity Stream', 'bp-multiblog-mode' ),
+			'callback'          => 'bp_multiblog_mode_admin_setting_callback_activity_stream',
+			'sanitize_callback' => 'intval',
+			'args'              => array()
+		);
+	}
+
 	return (array) apply_filters( 'bp_multiblog_mode_admin_get_settings_fields', $fields );
 }
 
@@ -168,6 +180,19 @@ function bp_multiblog_mode_admin_setting_callback_sites() {
 }
 
 /** General Section ***********************************************************/
+
+/**
+ * Display the Activity Stream setting field
+ *
+ * @since 1.0.0
+ */
+function bp_multiblog_mode_admin_setting_callback_activity_stream() { ?>
+
+	<input value="1" type="checkbox" name="_bp_multiblog_mode_activity_stream" id="_bp_multiblog_mode_activity_stream" <?php checked( bp_get_form_option( '_bp_multiblog_mode_activity_stream', false ) ); ?> />
+	<label for="_bp_multiblog_mode_activity_stream"><?php esc_html_e( 'Limit the displayed activity stream items to those belonging to this site', 'bp-multiblog-mode' ); ?></label>
+
+	<?php
+}
 
 /** Settings Page *************************************************************/
 
