@@ -130,6 +130,35 @@ function bp_multiblog_mode_get_enabled_sites( $args = array() ) {
 	return bp_multiblog_mode_get_sites( $args );
 }
 
+/** Activity ************************************************************/
+
+/**
+ * Modify the activity query WHERE statements
+ *
+ * @see BP_Activity_Activity::get()
+ *
+ * @since 1.0.0
+ *
+ * @param array $where Query WHERE statements
+ * @param array $args Query arguments
+ * @return array Query WHERE statements
+ */
+function bp_multiblog_mode_activity_limit_stream( $where, $args ) {
+	global $wpdb;
+
+	// Force return activity items belonging only to the current site
+	if ( bp_get_option( '_bp_multiblog_mode_activity_stream', false ) ) {
+
+		/**
+		 * Column 'item_id' can also mean id from activity/forums/groups etc.
+		 * components, so only filter blogs component activities.
+		 */
+		$where[] = $wpdb->prepare( "( a.item_id = %d OR a.component <> %s )", get_current_blog_id(), 'blogs' );
+	}
+
+	return $where;
+}
+
 /** XProfile ************************************************************/
 
 /**
