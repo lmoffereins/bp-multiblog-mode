@@ -153,7 +153,7 @@ function bp_multiblog_mode_activity_limit_stream( $where, $args ) {
 		 * Column 'item_id' can also mean id from activity/forums/groups etc.
 		 * components, so only filter blogs component activities.
 		 */
-		$where[] = $wpdb->prepare( "( a.item_id = %d OR a.component <> %s )", get_current_blog_id(), 'blogs' );
+		$where['bp_multiblog_mode_current_site'] = $wpdb->prepare( "( a.item_id = %d OR a.component <> %s )", get_current_blog_id(), 'blogs' );
 	}
 
 	return $where;
