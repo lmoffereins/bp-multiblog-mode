@@ -1,9 +1,9 @@
 <?php
 
 /**
- * BP Multiblog Mode Actions
+ * Plugin Functions
  *
- * @package BP Multiblog Mode
+ * @package Plugin
  * @subpackage Main
  */
 
@@ -14,10 +14,6 @@ defined( 'ABSPATH' ) || exit;
 
 add_action( 'bp_init',       'bp_multiblog_mode_init'       );
 add_action( 'bp_admin_init', 'bp_multiblog_mode_admin_init' );
-
-/** Activity ************************************************************/
-
-add_filter( 'bp_activity_get_where_conditions', 'bp_multiblog_mode_activity_limit_stream', 10, 5 );
 
 /** XProfile ************************************************************/
 

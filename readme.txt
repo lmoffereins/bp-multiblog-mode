@@ -11,10 +11,10 @@ Enable and customize BuddyPress on other sites than the root blog.
 
 == Description ==
 
-Wanting to have BuddyPress run on your subsites, but not all of them? Instead of defining the BP_ENABLE_MULTIBLOG constant, with this plugin you can choose on which sites BuddyPress acts like BP_ENABLE_MULTIBLOG was defined. In addition, this plugin allows you to:
+Wanting to have BuddyPress run on your subsites, but not all of them? Instead of defining the BP_ENABLE_MULTIBLOG constant, with this plugin you can choose on which sites BuddyPress acts like BP_ENABLE_MULTIBLOG was defined. In addition this plugin allows you to:
 
 * Define Extended Profile field groups per site
-* Limit Activity Stream items to those belonging to the current site
+* Limit Activity Stream items to those beloning to the current site [coming]
 * [more to come]
 
 Note that you need to have BuddyPress network-activated in your Multisite installation for this plugin to work.
