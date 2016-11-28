@@ -24,7 +24,7 @@ function bp_multiblog_mode_admin_get_settings_sections() {
 		// General Network settings
 		'bp_multiblog_mode_settings_general_network' => array(
 			'title'    => esc_html__( 'General Settings', 'bp-multiblog-mode' ),
-			'callback' => 'bp_multiblog_mode_admin_setting_callback_general_section',
+			'callback' => 'bp_multiblog_mode_admin_setting_callback_general_network_section',
 			'page'     => 'bp-multiblog-mode-network',
 		),
 
@@ -132,11 +132,11 @@ function bp_multiblog_mode_admin_page_has_settings( $page = '' ) {
 /** General Network Section ***************************************************/
 
 /**
- * Display the description of the General settings section
+ * Display the description of the General Network settings section
  *
  * @since 1.0.0
  */
-function bp_multiblog_mode_admin_setting_callback_general_section() { /* Nothing to show here */ }
+function bp_multiblog_mode_admin_setting_callback_general_network_section() { /* Nothing to show */ }
 
 /**
  * Display the enable Multiblog per site setting field
@@ -180,6 +180,18 @@ function bp_multiblog_mode_admin_setting_callback_sites() {
 }
 
 /** General Section ***********************************************************/
+
+/**
+ * Display the description of the General settings section
+ *
+ * @since 1.0.0
+ */
+function bp_multiblog_mode_admin_setting_callback_general_section() { ?>
+
+	<p><?php esc_html_e( 'Initially, this instance of BuddyPress is an identical presentation of the one at the root site. However, the settings below enable you to further tweak its presentation on this site to your own liking.', 'bp-multiblog-mode' ); ?></p>
+
+	<?php
+}
 
 /**
  * Display the Activity Stream setting field
