@@ -139,6 +139,9 @@ final class BP_Multiblog_Mode {
 		if ( $this->do_multiblog() && bp_multiblog_mode_is_enabled() ) {
 			add_filter( 'bp_get_root_blog_id',  array( $this, 'get_root_blog_id'  ) );
 			add_filter( 'bp_is_multiblog_mode', array( $this, 'is_multiblog_mode' ) );
+
+			// Reset actual root blog where necessary
+			add_filter( 'bp_get_taxonomy_term_site_id', array( $this, 'taxonomy_term_site_id' ), 1 );
 		}
 	}
 
@@ -229,6 +232,24 @@ final class BP_Multiblog_Mode {
 		$enabled = true;
 
 		return $enabled;
+	}
+
+	/**
+	 * Modify the site ID where the taxonomy terms live
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $site_id Site ID
+	 * @return int Site ID
+	 */
+	public function taxonomy_term_site_id( $site_id ) {
+
+		// Use the root's registered taxonomy terms
+		if ( bp_multiblog_mode_use_root_taxonomy_terms() ) {
+			$site_id = bp_multiblog_mode_get_root_blog_id();
+		}
+
+		return $site_id;
 	}
 }
 

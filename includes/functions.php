@@ -130,6 +130,17 @@ function bp_multiblog_mode_get_enabled_sites( $args = array() ) {
 	return bp_multiblog_mode_get_sites( $args );
 }
 
+/**
+ * Return whether the site uses the root's taxonomy terms
+ *
+ * @since 1.0.0
+ *
+ * @return bool Using root's taxonomy terms?
+ */
+function bp_multiblog_mode_use_root_taxonomy_terms() {
+	return ! get_option( '_bp_multiblog_mode_taxonomy_terms', false );
+}
+
 /** Activity ************************************************************/
 
 /**

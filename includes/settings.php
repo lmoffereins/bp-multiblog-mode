@@ -63,7 +63,16 @@ function bp_multiblog_mode_admin_get_settings_fields() {
 		),
 
 		// General settings		
-		'bp_multiblog_mode_settings_general' => array(),
+		'bp_multiblog_mode_settings_general' => array(
+
+			// Taxonomy terms
+			'_bp_multiblog_mode_taxonomy_terms' => array(
+				'title'             => esc_html__( 'Taxonomy terms', 'bp-multiblog-mode' ),
+				'callback'          => 'bp_multiblog_mode_admin_setting_callback_taxonomy_terms',
+				'sanitize_callback' => 'intval',
+				'args'              => array()
+			),
+		),
 	);
 
 	// Activity
@@ -188,7 +197,20 @@ function bp_multiblog_mode_admin_setting_callback_sites() {
  */
 function bp_multiblog_mode_admin_setting_callback_general_section() { ?>
 
-	<p><?php esc_html_e( 'Initially, this instance of BuddyPress is an identical presentation of the one at the root site. However, the settings below enable you to further tweak its presentation on this site to your own liking.', 'bp-multiblog-mode' ); ?></p>
+	<p><?php esc_html_e( 'Initially, this instance of BuddyPress is an identical presentation of the one at the root site. However, the settings below enable you to further tweak its unique presentation on this site to your own liking.', 'bp-multiblog-mode' ); ?></p>
+
+	<?php
+}
+
+/**
+ * Display the Taxonomy terms setting field
+ *
+ * @since 1.0.0
+ */
+function bp_multiblog_mode_admin_setting_callback_taxonomy_terms() { ?>
+
+	<input value="1" type="checkbox" name="_bp_multiblog_mode_taxonomy_terms" id="_bp_multiblog_mode_taxonomy_terms" <?php checked( bp_get_form_option( '_bp_multiblog_mode_taxonomy_terms', false ) ); ?> />
+	<label for="_bp_multiblog_mode_taxonomy_terms"><?php esc_html_e( "Register BuddyPress taxonomy terms (like member types) on this site. Defaults to using the root's taxonomy terms.", 'bp-multiblog-mode' ); ?></label>
 
 	<?php
 }
