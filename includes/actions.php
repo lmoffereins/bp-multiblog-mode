@@ -10,7 +10,7 @@
 // Exit if accessed directly
 defined( 'ABSPATH' ) || exit;
 
-/** General *************************************************************/
+/** Sub-actions *********************************************************/
 
 add_action( 'bp_init',       'bp_multiblog_mode_init'       );
 add_action( 'bp_admin_init', 'bp_multiblog_mode_admin_init' );
@@ -22,6 +22,11 @@ add_filter( 'bp_activity_get_where_conditions', 'bp_multiblog_mode_activity_limi
 /** XProfile ************************************************************/
 
 add_filter( 'bp_xprofile_get_groups', 'bp_multiblog_mode_xprofile_get_groups', 10, 2 );
+
+/** Files ***************************************************************/
+
+add_filter( 'bp_core_avatar_upload_path', 'bp_multiblog_mode_core_avatar_upload_path' );
+add_filter( 'bp_core_avatar_url',         'bp_multiblog_mode_core_avatar_url'         );
 
 /** Admin ***************************************************************/
 

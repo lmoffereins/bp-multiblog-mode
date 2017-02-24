@@ -257,3 +257,81 @@ function bp_multiblog_mode_xprofile_get_groups( $groups, $args ) {
 
 	return $groups;
 }
+
+/** Files ***************************************************************/
+
+/**
+ * Return the upload dir for the BP's root blog
+ *
+ * @since 1.0.0
+ *
+ * @return array Root upload dir data
+ */
+function bp_multiblog_mode_root_upload_dir() {
+	$plugin = bp_multiblog_mode();
+
+	if ( empty( $plugin->upload_dir ) ) {
+		switch_to_blog( bp_multiblog_mode_get_root_blog_id() );
+
+		// Get root upload dir
+		$upload_dir = wp_upload_dir();
+
+		restore_current_blog();
+
+		// Bail when an error occurred
+		if ( ! empty( $upload_dir['error'] ) )
+			return false;
+
+		$plugin->upload_dir = $upload_dir;
+	}
+
+	return $plugin->upload_dir;
+}
+
+/**
+ * Modify the avatar's upload path
+ *
+ * @since 1.0.0
+ *
+ * @param string $path Avatar upload path
+ * @return string Avatar upload path
+ */
+function bp_multiblog_mode_core_avatar_upload_path( $path ) {
+
+	// When using root avatars
+	if ( bp_multiblog_mode_is_enabled() && ! defined( 'BP_AVATAR_UPLOAD_PATH' ) && ! get_option( '_bp_multiblog_mode_avatar_uploads' ) ) {
+		$uploads = bp_multiblog_mode_root_upload_dir();
+
+		if ( $uploads ) {
+			$path = $uploads['basedir'];
+		}
+	}
+
+	return $path;
+}
+
+/**
+ * Modify the avatar's base url
+ *
+ * @since 1.0.0
+ *
+ * @param string $url Avatar base url
+ * @return string Avatar base url
+ */
+function bp_multiblog_mode_core_avatar_url( $url ) {
+
+	// When using root avatars
+	if ( bp_multiblog_mode_is_enabled() && ! defined( 'BP_AVATAR_URL' ) && ! get_option( '_bp_multiblog_mode_avatar_uploads' ) ) {
+		$uploads = bp_multiblog_mode_root_upload_dir();
+
+		if ( $uploads ) {
+			$url = $uploads['baseurl'];
+
+			if ( is_ssl() ) {
+				$url = str_replace( 'http://', 'https://', $url );
+			}
+		}
+	}
+
+	return $url;
+}

@@ -80,8 +80,18 @@ function bp_multiblog_mode_admin_get_settings_fields() {
 
 		// Activity Stream
 		$fields['bp_multiblog_mode_settings_general']['_bp_multiblog_mode_activity_stream'] = array(
-			'title'             => esc_html__( 'Activity Stream', 'bp-multiblog-mode' ),
+			'title'             => esc_html__( 'Activity stream', 'bp-multiblog-mode' ),
 			'callback'          => 'bp_multiblog_mode_admin_setting_callback_activity_stream',
+			'sanitize_callback' => 'intval',
+			'args'              => array()
+		);
+	}
+
+	// Avatar uploads
+	if ( ! bp_disable_avatar_uploads( false ) ) {
+		$fields['bp_multiblog_mode_settings_general']['_bp_multiblog_mode_avatar_uploads'] = array(
+			'title'             => esc_html__( 'Avatar uploads', 'bp-multiblog-mode' ),
+			'callback'          => 'bp_multiblog_mode_admin_setting_callback_avatar_uploads',
 			'sanitize_callback' => 'intval',
 			'args'              => array()
 		);
@@ -210,20 +220,46 @@ function bp_multiblog_mode_admin_setting_callback_general_section() { ?>
 function bp_multiblog_mode_admin_setting_callback_taxonomy_terms() { ?>
 
 	<input value="1" type="checkbox" name="_bp_multiblog_mode_taxonomy_terms" id="_bp_multiblog_mode_taxonomy_terms" <?php checked( bp_get_form_option( '_bp_multiblog_mode_taxonomy_terms', false ) ); ?> />
-	<label for="_bp_multiblog_mode_taxonomy_terms"><?php esc_html_e( "Register BuddyPress taxonomy terms (like member types) on this site. Defaults to using the root's taxonomy terms.", 'bp-multiblog-mode' ); ?></label>
+	<label for="_bp_multiblog_mode_taxonomy_terms"><?php esc_html_e( "Register BuddyPress taxonomy terms and term relationships (like member types) on this site. Defaults to using the root's taxonomy terms.", 'bp-multiblog-mode' ); ?></label>
 
 	<?php
 }
 
 /**
- * Display the Activity Stream setting field
+ * Display the Members setting field
+ *
+ * @since 1.0.0
+ */
+function bp_multiblog_mode_admin_setting_callback_site_members() { ?>
+
+	<input value="1" type="checkbox" name="_bp_multiblog_mode_site_members" id="_bp_multiblog_mode_site_members" <?php checked( bp_get_form_option( '_bp_multiblog_mode_site_members', false ) ); ?> />
+	<label for="_bp_multiblog_mode_site_members"><?php esc_html_e( "Limit this site's instance of BuddyPress to members who are registered users of this site", 'bp-multiblog-mode' ); ?></label>
+
+	<?php
+}
+
+/**
+ * Display the Activity stream setting field
  *
  * @since 1.0.0
  */
 function bp_multiblog_mode_admin_setting_callback_activity_stream() { ?>
 
 	<input value="1" type="checkbox" name="_bp_multiblog_mode_activity_stream" id="_bp_multiblog_mode_activity_stream" <?php checked( bp_get_form_option( '_bp_multiblog_mode_activity_stream', false ) ); ?> />
-	<label for="_bp_multiblog_mode_activity_stream"><?php esc_html_e( 'Limit the displayed activity stream items to those belonging to this site', 'bp-multiblog-mode' ); ?></label>
+	<label for="_bp_multiblog_mode_activity_stream"><?php esc_html_e( 'Limit the Activity stream to display only items that are created on this site', 'bp-multiblog-mode' ); ?></label>
+
+	<?php
+}
+
+/**
+ * Display the Avatar uploads setting field
+ *
+ * @since 1.0.0
+ */
+function bp_multiblog_mode_admin_setting_callback_avatar_uploads() { ?>
+
+	<input value="1" type="checkbox" name="_bp_multiblog_mode_avatar_uploads" id="_bp_multiblog_mode_avatar_uploads" <?php checked( bp_get_form_option( '_bp_multiblog_mode_avatar_uploads', false ) ); ?> />
+	<label for="_bp_multiblog_mode_avatar_uploads"><?php esc_html_e( 'Store avatar uploads on this site. Defaults to using root avatars.', 'bp-multiblog-mode' ); ?></label>
 
 	<?php
 }
