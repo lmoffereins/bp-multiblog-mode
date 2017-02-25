@@ -25,6 +25,7 @@ add_filter( 'bp_xprofile_get_groups', 'bp_multiblog_mode_xprofile_get_groups', 1
 
 /** Files ***************************************************************/
 
+add_action( 'bp_setup_globals',           'bp_multiblog_mode_set_root_upload_dir',  1 );
 add_filter( 'bp_core_avatar_upload_path', 'bp_multiblog_mode_core_avatar_upload_path' );
 add_filter( 'bp_core_avatar_url',         'bp_multiblog_mode_core_avatar_url'         );
 

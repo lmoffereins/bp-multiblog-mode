@@ -34,6 +34,13 @@ function bp_multiblog_mode_admin_get_settings_sections() {
 			'callback' => 'bp_multiblog_mode_admin_setting_callback_general_section',
 			'page'     => 'bp-multiblog-mode',
 		),
+
+		// Profile settings
+		'bp_multiblog_mode_settings_profile' => array(
+			'title'    => esc_html__( 'Profile Settings', 'bp-multiblog-mode' ),
+			'callback' => 'bp_multiblog_mode_admin_setting_callback_profile_section',
+			'page'     => 'bp-multiblog-mode',
+		),
 	) );
 }
 
@@ -73,6 +80,27 @@ function bp_multiblog_mode_admin_get_settings_fields() {
 				'args'              => array()
 			),
 		),
+
+		// Profile settings		
+		'bp_multiblog_mode_settings_profile' => array(
+
+
+			// Avatar uploads
+			'_bp_multiblog_mode_avatar_uploads' => array(
+				'title'             => esc_html__( 'Avatar uploads', 'bp-multiblog-mode' ),
+				'callback'          => 'bp_multiblog_mode_admin_setting_callback_avatar_uploads',
+				'sanitize_callback' => 'intval',
+				'args'              => array()
+			),
+
+			// File uploads
+			'_bp_multiblog_mode_file_uploads' => array(
+				'title'             => esc_html__( 'File uploads', 'bp-multiblog-mode' ),
+				'callback'          => 'bp_multiblog_mode_admin_setting_callback_file_uploads',
+				'sanitize_callback' => 'intval',
+				'args'              => array()
+			),
+		),
 	);
 
 	// Activity
@@ -87,14 +115,9 @@ function bp_multiblog_mode_admin_get_settings_fields() {
 		);
 	}
 
-	// Avatar uploads
-	if ( ! bp_disable_avatar_uploads( false ) ) {
-		$fields['bp_multiblog_mode_settings_general']['_bp_multiblog_mode_avatar_uploads'] = array(
-			'title'             => esc_html__( 'Avatar uploads', 'bp-multiblog-mode' ),
-			'callback'          => 'bp_multiblog_mode_admin_setting_callback_avatar_uploads',
-			'sanitize_callback' => 'intval',
-			'args'              => array()
-		);
+	// Avatar uploads is disabled
+	if ( bp_disable_avatar_uploads( false ) ) {
+		unset( $fields['bp_multiblog_mode_settings_profile']['_bp_multiblog_mode_avatar_uploads'] );
 	}
 
 	return (array) apply_filters( 'bp_multiblog_mode_admin_get_settings_fields', $fields );
@@ -246,10 +269,19 @@ function bp_multiblog_mode_admin_setting_callback_site_members() { ?>
 function bp_multiblog_mode_admin_setting_callback_activity_stream() { ?>
 
 	<input value="1" type="checkbox" name="_bp_multiblog_mode_activity_stream" id="_bp_multiblog_mode_activity_stream" <?php checked( bp_get_form_option( '_bp_multiblog_mode_activity_stream', false ) ); ?> />
-	<label for="_bp_multiblog_mode_activity_stream"><?php esc_html_e( 'Limit the Activity stream to display only items that are created on this site', 'bp-multiblog-mode' ); ?></label>
+	<label for="_bp_multiblog_mode_activity_stream"><?php esc_html_e( 'Limit the Activity stream to display only items that are created on this site.', 'bp-multiblog-mode' ); ?></label>
 
 	<?php
 }
+
+/** Profile Section ***********************************************************/
+
+/**
+ * Display the description of the Profile settings section
+ *
+ * @since 1.0.0
+ */
+function bp_multiblog_mode_admin_setting_callback_profile_section() { /* Nothing to display */ }
 
 /**
  * Display the Avatar uploads setting field
@@ -260,6 +292,19 @@ function bp_multiblog_mode_admin_setting_callback_avatar_uploads() { ?>
 
 	<input value="1" type="checkbox" name="_bp_multiblog_mode_avatar_uploads" id="_bp_multiblog_mode_avatar_uploads" <?php checked( bp_get_form_option( '_bp_multiblog_mode_avatar_uploads', false ) ); ?> />
 	<label for="_bp_multiblog_mode_avatar_uploads"><?php esc_html_e( 'Store avatar uploads on this site. Defaults to using root avatars.', 'bp-multiblog-mode' ); ?></label>
+
+	<?php
+}
+
+/**
+ * Display the File uploads setting field
+ *
+ * @since 1.0.0
+ */
+function bp_multiblog_mode_admin_setting_callback_file_uploads() { ?>
+
+	<input value="1" type="checkbox" name="_bp_multiblog_mode_file_uploads" id="_bp_multiblog_mode_file_uploads" <?php checked( bp_get_form_option( '_bp_multiblog_mode_file_uploads', false ) ); ?> />
+	<label for="_bp_multiblog_mode_file_uploads"><?php esc_html_e( 'Store non-avatar file uploads on this site. Defaults to using root file uploads.', 'bp-multiblog-mode' ); ?></label>
 
 	<?php
 }
