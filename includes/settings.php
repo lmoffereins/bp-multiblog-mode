@@ -113,6 +113,12 @@ function bp_multiblog_mode_admin_get_settings_fields() {
 			'sanitize_callback' => 'intval',
 			'args'              => array()
 		);
+
+		// Site Members
+		$fields['bp_multiblog_mode_settings_general']['_bp_multiblog_mode_site_members'] = array(
+			'sanitize_callback' => 'intval',
+			'args'              => array()
+		);
 	}
 
 	// Avatar uploads is disabled
@@ -268,8 +274,17 @@ function bp_multiblog_mode_admin_setting_callback_site_members() { ?>
  */
 function bp_multiblog_mode_admin_setting_callback_activity_stream() { ?>
 
-	<input value="1" type="checkbox" name="_bp_multiblog_mode_activity_stream" id="_bp_multiblog_mode_activity_stream" <?php checked( bp_get_form_option( '_bp_multiblog_mode_activity_stream', false ) ); ?> />
-	<label for="_bp_multiblog_mode_activity_stream"><?php esc_html_e( 'Limit the Activity stream to display only items that are created on this site.', 'bp-multiblog-mode' ); ?></label>
+	<p><?php esc_html_e( 'Limit the Activity Stream to display only items that are the following:', 'bp-multiblog-mode' ); ?></p>
+
+	<p>
+		<input value="1" type="checkbox" name="_bp_multiblog_mode_activity_stream" id="_bp_multiblog_mode_activity_stream" <?php checked( bp_get_form_option( '_bp_multiblog_mode_activity_stream', false ) ); ?> />
+		<label for="_bp_multiblog_mode_activity_stream"><?php esc_html_e( 'Items that are created on this site', 'bp-multiblog-mode' ); ?></label>
+	</p>
+
+	<p>
+		<input value="1" type="checkbox" name="_bp_multiblog_mode_site_members" id="_bp_multiblog_mode_site_members" <?php checked( bp_get_form_option( '_bp_multiblog_mode_site_members', false ) ); ?> />
+		<label for="_bp_multiblog_mode_site_members"><?php esc_html_e( 'Items that are created by members who are a user of this site', 'bp-multiblog-mode' ); ?></label>
+	</p>
 
 	<?php
 }

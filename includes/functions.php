@@ -178,6 +178,14 @@ function bp_multiblog_mode_activity_limit_stream( $where, $args ) {
 		$where['bp_multiblog_mode_current_site'] = $wpdb->prepare( "( a.item_id = %d OR a.component <> %s )", get_current_blog_id(), 'blogs' );
 	}
 
+	// Force return activity items created by users of the current site
+	if ( bp_get_option( '_bp_multiblog_mode_site_members', false ) ) {
+
+		// `WP_User_Query` defaults to users of the current site
+		$members = get_users( array( 'fields' => 'ids' ) );
+		$where['bp_multiblog_mode_site_members'] = sprintf( "a.user_id IN ( %s )", implode( ',', $members ) );
+	}
+
 	return $where;
 }
 
