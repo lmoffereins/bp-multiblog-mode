@@ -116,7 +116,7 @@ final class BP_Multiblog_Mode {
 		}
 
 		// Hooks
-		if ( $this->do_multiblog() ) {
+		if ( $this->can_multiblog() ) {
 			require( $this->includes_dir . 'actions.php' );
 		}
 	}
@@ -136,9 +136,9 @@ final class BP_Multiblog_Mode {
 		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ), 20 );
 
 		// Do Multiblog for the enabled site
-		if ( $this->do_multiblog() && bp_multiblog_mode_is_enabled() ) {
-			add_filter( 'bp_get_root_blog_id',  array( $this, 'get_root_blog_id'  ) );
-			add_filter( 'bp_is_multiblog_mode', array( $this, 'is_multiblog_mode' ) );
+		if ( $this->can_multiblog() && bp_multiblog_mode_is_enabled() ) {
+			add_filter( 'bp_get_root_blog_id',  'get_current_blog_id' );
+			add_filter( 'bp_is_multiblog_mode', '__return_true'       );
 
 			// Reset actual root blog where necessary
 			add_filter( 'bp_get_taxonomy_term_site_id', array( $this, 'taxonomy_term_site_id' ), 1 );
@@ -152,15 +152,15 @@ final class BP_Multiblog_Mode {
 	 *
 	 * Checks whether:
 	 * - BP is network activated
-	 * - BP_ENABLE_MULTIBLOG is not set or true
+	 * - BP_ENABLE_MULTIBLOG is not enabled through the constant
 	 * - there are multiple sites in the network
 	 *
 	 * @since 1.0.0
 	 *
 	 * @return bool Can we do Multiblog?
 	 */
-	public function do_multiblog() {
-		return bp_is_network_activated() && ( ! defined( 'BP_ENABLE_MULTIBLOG' ) || ! BP_ENABLE_MULTIBLOG ) && 1 < (int) get_blog_count();
+	public function can_multiblog() {
+		return bp_is_network_activated() && ! ( defined( 'BP_ENABLE_MULTIBLOG' ) && BP_ENABLE_MULTIBLOG ) && (int) get_blog_count() > 1;
 	}
 
 	/**
@@ -199,40 +199,6 @@ final class BP_Multiblog_Mode {
 	}
 
 	/** Public methods **************************************************/
-
-	/**
-	 * Modify the ID of the root blog where BuddyPress is loaded
-	 *
-	 * This mimics the exact behavior of BP when BP_ENABLE_MULTIBLOG = true.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param int $blog_id Root blog ID
-	 * @return int Root blog ID
-	 */
-	public function get_root_blog_id( $blog_id ) {
-
-		// Make the current site BP's root
-		$blog_id = get_current_blog_id();
-
-		return $blog_id;
-	}
-
-	/**
-	 * Modify whether we're in BuddyPress's Multiblog mode
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param bool $enabled
-	 * @return bool Are we in Multiblog mode?
-	 */
-	public function is_multiblog_mode( $enabled ) {
-		
-		// Explicitly enable Multiblog mode
-		$enabled = true;
-
-		return $enabled;
-	}
 
 	/**
 	 * Modify the site ID where the taxonomy terms live
