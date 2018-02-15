@@ -157,6 +157,10 @@ function bp_multiblog_mode_use_root_taxonomy_terms() {
 function bp_multiblog_mode_activity_limit_stream( $where, $args ) {
 	global $wpdb;
 
+	// Bail when Multiblog is not enabled
+	if ( ! bp_multiblog_mode_is_enabled() )
+		return $where;
+
 	// Get BuddyPress
 	$bp = buddypress();
 
