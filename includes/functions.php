@@ -65,9 +65,9 @@ function bp_multiblog_mode_is_enabled( $site_id = 0 ) {
 	// Define return value
 	$retval = false;
 
-	// Enable when BP is network activated, but not when we're on the real root blog
+	// Check the site's setting when BP is network activated, but not for the real root blog
 	if ( bp_is_network_activated() && ! bp_multiblog_mode_is_root_blog( $site_id ) ) {
-		$retval = get_blog_option( $site_id, '_bp_multiblog_mode_enabled', false );
+		$retval = (bool) get_blog_option( $site_id, '_bp_multiblog_mode_enabled', false );
 	}
 
 	return $retval;
