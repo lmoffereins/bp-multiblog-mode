@@ -343,9 +343,9 @@ function bp_multiblog_mode_admin_settings_page() {
 
 	<div class="wrap">
 
-		<h1><?php _e( 'BuddyPress Settings', 'buddypress' ); ?> </h1>
+		<h1><?php esc_html_e( 'BuddyPress Settings', 'buddypress' ); ?> </h1>
 
-		<h2 class="nav-tab-wrapper"><?php bp_core_admin_tabs( __( 'Multiblog', 'bp-multiblog-mode' ) ); ?></h2>
+		<h2 class="nav-tab-wrapper"><?php bp_core_admin_tabs( esc_html__( 'Multiblog', 'bp-multiblog-mode' ) ); ?></h2>
 	
 		<form action="<?php echo esc_url( $form_action ) ?>" method="post">
 

@@ -85,8 +85,8 @@ class BP_Multiblog_Mode_Admin {
 		// Core settings page
 		$hook = add_submenu_page(
 			$this->parent_page,
-			__( 'BuddyPress Multiblog', 'bp-multiblog-mode' ),
-			__( 'Multiblog', 'bp-multiblog-mode' ),
+			esc_html__( 'BuddyPress Multiblog', 'bp-multiblog-mode' ),
+			esc_html__( 'Multiblog', 'bp-multiblog-mode' ),
 			$this->minimum_capability,
 			'bp-multiblog-mode',
 			'bp_multiblog_mode_admin_settings_page'
@@ -121,7 +121,7 @@ class BP_Multiblog_Mode_Admin {
 		if ( bp_multiblog_mode_admin_page_has_settings( $this->settings_page ) ) {
 			$tabs[] = array(
 				'href' => bp_get_admin_url( add_query_arg( array( 'page' => 'bp-multiblog-mode' ), 'admin.php' ) ),
-				'name' => __( 'Multiblog', 'bp-multiblog-mode' ),
+				'name' => esc_html__( 'Multiblog', 'bp-multiblog-mode' ),
 			);
 		}
 
@@ -292,9 +292,9 @@ class BP_Multiblog_Mode_Admin {
 		?>
 
 		<div id="bp-multiblog-mode_sitediv" class="postbox">
-			<h2><?php _e( 'Sites', 'bp-multiblog-mode' ); ?></h2>
+			<h2><?php esc_html_e( 'Sites', 'bp-multiblog-mode' ); ?></h2>
 			<div class="inside">
-				<p class="description"><?php _e( 'This group should be available at:', 'bp-multiblog-mode' ); ?></p>
+				<p class="description"><?php esc_html_e( 'This group should be available at:', 'bp-multiblog-mode' ); ?></p>
 
 				<ul>
 					<?php foreach ( $sites as $site ) : ?>
@@ -312,7 +312,7 @@ class BP_Multiblog_Mode_Admin {
 					</li>
 					<?php endforeach; ?>
 				</ul>
-				<p class="description member-type-none-notice<?php if ( ! empty( $group_sites ) ) : ?> hide<?php endif; ?>"><?php _e( 'Unavailable to all sites.', 'bp-multiblog-mode' ) ?></p>
+				<p class="description member-type-none-notice<?php if ( ! empty( $group_sites ) ) : ?> hide<?php endif; ?>"><?php esc_html_e( 'Unavailable to all sites.', 'bp-multiblog-mode' ) ?></p>
 			</div>
 
 			<input type="hidden" name="has-group-sites" value="1" />
@@ -401,14 +401,14 @@ class BP_Multiblog_Mode_Admin {
 
 			if ( 1 === $count ) {
 				$site_id    = reset( $group_sites );
-				$label_text = sprintf( __( 'Site: %s', 'bp-multiblog-mode' ), get_blog_option( $site_id, 'blogname' ) );
+				$label_text = sprintf( esc_html__( 'Site: %s', 'bp-multiblog-mode' ), get_blog_option( $site_id, 'blogname' ) );
 			} else {
-				$label_text = sprintf( __( 'For %d Sites', 'bp-multiblog-mode' ), $count );
+				$label_text = sprintf( esc_html__( 'For %d Sites', 'bp-multiblog-mode' ), $count );
 			}
 
 			$label = '<div class="button group-sites" disabled="disabled">' . $label_text . '</div>';
 		} else {
-			$label = '<div class="button group-sites-error" disabled="disabled">' . __( 'Unavailable to all sites', 'bp-multiblog-mode' ) . '</div>';
+			$label = '<div class="button group-sites-error" disabled="disabled">' . esc_html__( 'Unavailable to all sites', 'bp-multiblog-mode' ) . '</div>';
 		}
 
 		echo $label;
