@@ -236,7 +236,7 @@ function bp_multiblog_mode_admin_setting_callback_sites() {
  */
 function bp_multiblog_mode_admin_setting_callback_general_section() { ?>
 
-	<p><?php esc_html_e( 'Initially, this instance of BuddyPress is an identical presentation of the one at the root site. However, the settings below enable you to further tweak its unique presentation on this site to your own liking.', 'bp-multiblog-mode' ); ?></p>
+	<p><?php esc_html_e( "Initially, this  site's instance of BuddyPress is an identical presentation of the one at the root site. However, the settings below enable you to further tweak its unique presentation on this site.", 'bp-multiblog-mode' ); ?></p>
 
 	<?php
 }
