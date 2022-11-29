@@ -146,17 +146,15 @@ class BP_Multiblog_Mode_Admin {
 		if ( $screen->id === $this->plugin_screen_id ) {
 
 			// Mimic post inline-edit styles for .cat-checklist
-			$styles[] = '.form-table .cat-checklist { padding: 0 9px; }';
+			$styles[] = '.form-table .widefat th, .form-table .widefat td { padding: 8px 10px; font-weight: normal; }';
+			$styles[] = '.form-table .widefat .check-column { width: 2.2em; }';
 			$styles[] = '.form-table p + .cat-checklist { margin-top: 6px; }';
-			$styles[] = '.form-table .cat-checklist li { margin: 0; position: relative; }';
-			$styles[] = '.form-table .cat-checklist label { margin: .5em 0; display: block; }';
-			$styles[] = '.form-table .cat-checklist input[type="checkbox"] { vertical-align: middle; }';
-			$styles[] = '.form-table .cat-checklist label .description { padding-left: 25px; display: block; opacity: .7; }';
+			$styles[] = '.form-table .widefat .column-blogname strong { display: block; margin-bottom: .2em; font-size: 14px; }';
+			$styles[] = '.form-table .widefat .column-blogname strong ~ span { font-size: 13px; font-style: italic; line-height: 1.5em; }';
 
 			// Small screens
 			$styles[] = '@media screen and (max-width: 782px) {';
-			$styles[] = '.form-table .cat-checklist label { max-width: none; float: none; margin: 1em 0; font-size: 16px; }';
-			$styles[] = '.form-table .cat-checklist label .description { padding: 0 0 0 34px; }';
+			$styles[] = '.form-table .widefat th, .form-table .widefat td { display: table-cell; }';
 			$styles[] = '}';
 
 		// BP XProfile admin page

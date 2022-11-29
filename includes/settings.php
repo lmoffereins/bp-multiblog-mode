@@ -198,29 +198,63 @@ function bp_multiblog_mode_admin_setting_callback_sites() {
 
 	<p><?php esc_html_e( 'Select the network sites that should have Multiblog enabled.', 'bp-multiblog-mode' ); ?></p>
 
-	<ul class="cat-checklist">
+	<table class="cat-checklist wp-list-table widefat fixed striped">
+		<thead>
+			<tr>
+				<td class="manage-column column-cb check-column">
+					<label class="screen-reader-text" for="cb-select-all-1"><?php esc_html_e( 'Select all' ); ?></label>
+					<input type="checkbox" id="cb-select-all-1" />
+				</td>
+				<th class="manage-column column-blogname column-primary">
+					<?php esc_html_e( 'Site', 'bp-multiblog-mode' ); ?>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
 
 		<?php foreach ( $sites as $site ) :
-			$is_root_blog = bp_multiblog_mode_is_root_blog( $site->id ); ?>
+			$is_root_blog = bp_multiblog_mode_is_root_blog( $site->id );
+			$is_main_site = is_main_site( $site->id );
+			$selected     = get_blog_option( $site->id, '_bp_multiblog_mode_enabled', false ) || $is_root_blog;
+			$url          = $selected ? add_query_arg( 'page', 'bp-components', get_admin_url( $site->id, 'options-general.php' ) ) : get_admin_url( $site->id, 'index.php' );
 
-		<li id="site-<?php echo esc_attr( $site->id ); ?>">
-			<label class="selectit">
-				<input value="<?php echo $site->id; ?>" type="checkbox" name="bp_multiblog_mode_sites[]" id="enabled-site-<?php echo esc_attr( $site->id ); ?>" <?php disabled( $is_root_blog ); checked( get_blog_option( $site->id, '_bp_multiblog_mode_enabled', false ) || $is_root_blog ); ?> />
-				<?php echo $site->blogname; ?>
+			$main_site = $is_root_blog && ! $is_main_site
+				? esc_html__( 'BuddyPress Root Site', 'bp-multiblog-mode' )
+				: ( $is_main_site ? esc_html__( 'Main Site', 'bp-multiblog-mode' ) : '' );
 
-				<?php if ( $is_root_blog && ! is_main_site( $site->id ) ) : ?>
-					<strong>&mdash; <?php esc_html_e( 'BuddyPress Root Site', 'bp-multiblog-mode' ); ?></strong>
-				<?php elseif ( is_main_site( $site->id ) ) : ?>
-					<strong>&mdash; <?php esc_html_e( 'Main Site', 'bp-multiblog-mode' ); ?></strong>
-				<?php endif; ?>
+			if ( $main_site ) {
+				$main_site = ' &mdash; <span class="post-site">' . $main_site . '</span>';
+			}
+		?>
 
-				<span class="description"><?php echo $site->siteurl; ?></span>
-			</label>
-		</li>
+			<tr>
+				<th scope="row" class="check-column">
+					<?php if ( ! $is_root_blog ) : ?>
+					<label class="screen-reader-text" for="blog_<?php echo $site->id; ?>"><?php printf( esc_html__( 'Select %s' ), $site->blogname ); ?></label>
+					<input value="<?php echo esc_attr( $site->id ); ?>" type="checkbox" name="bp_multiblog_mode_sites[]" id="blog_<?php echo $site->id; ?>" <?php disabled( $is_root_blog ); checked( $selected ); ?> />
+					<?php endif; ?>
+				</th>
+				<td class="column-blogname column-primary" data-colname="<?php esc_attr_e( 'Site', 'bp-multiblog-mode' ); ?>">
+					<strong>
+						<a href="<?php echo esc_url( $url ); ?>" class="edit"><?php echo $site->blogname; ?></a><?php echo $main_site; ?>
+					</strong>
+					<span class="site-domain"><?php echo $site->domain; ?></span>
+				</td>
+			</tr>
 
 		<?php endforeach; ?>
 
-	</ul>
+		</tbody>
+		<tfoot>
+			<tr>
+				<td class="manage-column column-cb check-column">
+					<label class="screen-reader-text" for="cb-select-all-2"><?php esc_html_e( 'Select all' ); ?></label>
+					<input type="checkbox" id="cb-select-all-2" />
+				</td>
+				<th class="manage-column column-blogname column-primary"><?php esc_html_e( 'Site', 'bp-multiblog-mode' ); ?></th>
+			</tr>
+		</tfoot>
+	</table>
 
 	<input type="hidden" name="bp_multiblog_mode_site_ids" value="<?php echo implode( ',', wp_list_pluck( $sites, 'id' ) ); ?>" />
 
