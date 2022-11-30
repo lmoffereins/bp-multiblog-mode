@@ -47,10 +47,14 @@ class BP_Multiblog_Mode_Admin {
 	 */
 	private function setup_actions() {
 
+		// For backcompat, consider admin hook
+		$admin_menus_hook = function_exists( 'bp_core_get_admin_settings_tabs' ) ? 'bp_admin_submenu_pages' : bp_core_admin_hook();
+
 		// Admin page
-		add_action( bp_core_admin_hook(),     array( $this, 'admin_menus' )      );
-		add_filter( 'bp_admin_head',          array( $this, 'admin_head'  ), 999 );
-		add_filter( 'bp_core_get_admin_tabs', array( $this, 'admin_tabs'  )      );
+		add_action( $admin_menus_hook,                 array( $this, 'admin_menus' )         );
+		add_filter( 'bp_admin_head',                   array( $this, 'admin_head'  ), 999    );
+		add_filter( 'bp_core_get_admin_settings_tabs', array( $this, 'admin_tabs'  )         );
+		add_filter( 'bp_core_get_admin_tabs',          array( $this, 'admin_tabs'  ),  10, 2 );
 
 		// Styling
 		add_action( 'bp_admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -71,8 +75,10 @@ class BP_Multiblog_Mode_Admin {
 	 * Register network admin menu elements
 	 *
 	 * @since 1.0.0
+	 *
+	 * @param array $submenu_pages The BP_Admin submenu pages passed by reference
 	 */
-	public function admin_menus() {
+	public function admin_menus( &$submenu_pages = array() ) {
 
 		// Bail when user cannot manage
 		if ( ! bp_current_user_can( $this->minimum_capability ) )
@@ -82,8 +88,10 @@ class BP_Multiblog_Mode_Admin {
 		if ( ! bp_multiblog_mode_admin_page_has_settings( $this->settings_page ) )
 			return;
 
+		$hooks = array();
+
 		// Core settings page
-		$hook = add_submenu_page(
+		$settings_page = add_submenu_page(
 			$this->parent_page,
 			esc_html__( 'BuddyPress Multiblog', 'bp-multiblog-mode' ),
 			esc_html__( 'Multiblog', 'bp-multiblog-mode' ),
@@ -92,8 +100,14 @@ class BP_Multiblog_Mode_Admin {
 			'bp_multiblog_mode_admin_settings_page'
 		);
 
+		$submenu_pages['settings']['bp-multiblog-mode'] = $settings_page;
+		$hooks[]                                        = $settings_page;
+
 		// Blend in BP's administration
-		add_action( "admin_head-{$hook}", 'bp_core_modify_admin_menu_highlight' );
+		foreach ( $hooks as $hook ) {
+			add_action( "admin_head-{$hook}", 'bp_core_modify_admin_menu_highlight' );
+		}
+
 	}
 
 	/**
@@ -113,16 +127,43 @@ class BP_Multiblog_Mode_Admin {
 	 * @since 1.0.0
 	 *
 	 * @param array $tabs Page tags
+	 * @param string $context Tabs context. Defaults to 'settings' for backcompat
 	 * @return array Page tabs
 	 */
-	public function admin_tabs( $tabs ) {
+	public function admin_tabs( $tabs, $context = 'settings' ) {
+
+		// Prepare tabs
+		$settings_tabs = array();
+		$tools_tabs    = array();
 
 		// Append Multiblog Mode page tab, when settings are registered
 		if ( bp_multiblog_mode_admin_page_has_settings( $this->settings_page ) ) {
-			$tabs[] = array(
+			$settings_tabs[] = array(
+				'id'   => 'bp-multiblog-mode',
 				'href' => bp_get_admin_url( add_query_arg( array( 'page' => 'bp-multiblog-mode' ), 'admin.php' ) ),
 				'name' => esc_html__( 'Multiblog', 'bp-multiblog-mode' ),
 			);
+		}
+
+		// Add settings tabs
+		if ( 'settings' === $context ) {
+			foreach ( $settings_tabs as $tab ) {
+
+				// For backcompat, only add tab once
+				if ( ! isset( $tabs[ $tab['id'] ] ) ) {
+					$tabs[ $tab['id'] ] = $tab;
+				}
+			}
+
+		// Add tools tabs
+		} else if ( 'tools' === $context ) {
+			foreach ( $tools_tabs as $tab ) {
+
+				// For backcompat, only add tab once
+				if ( ! isset( $tabs[ $tab['id'] ] ) ) {
+					$tabs[ $tab['id'] ] = $tab;
+				}
+			}
 		}
 
 		return $tabs;

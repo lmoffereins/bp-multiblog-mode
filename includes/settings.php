@@ -373,28 +373,42 @@ function bp_multiblog_mode_admin_settings_page() {
 	$form_action   = is_network_admin() ? add_query_arg( 'page', 'bp-multiblog-mode', bp_get_admin_url( 'admin.php' ) ) : 'options.php';
 	$settings_page = bp_multiblog_mode()->admin->settings_page;
 
-	?>
+	// For backcompat, check tabbed header
+	$is_tabbed_header = function_exists( 'bp_core_admin_tabbed_screen_header' );
+
+	if ( $is_tabbed_header ) : ?>
+
+	<?php bp_core_admin_tabbed_screen_header( __( 'BuddyPress Settings', 'buddypress' ), __( 'Multiblog', 'bp-multiblog-mode' ) ); ?>
+
+	<?php else : ?>
 
 	<div class="wrap">
 
-		<h1><?php esc_html_e( 'BuddyPress Settings', 'buddypress' ); ?> </h1>
+		<h1><?php esc_html_e( 'BuddyPress Settings', 'buddypress' ); ?></h1>
 
 		<h2 class="nav-tab-wrapper"><?php bp_core_admin_tabs( esc_html__( 'Multiblog', 'bp-multiblog-mode' ) ); ?></h2>
-	
-		<form action="<?php echo esc_url( $form_action ) ?>" method="post">
 
-			<?php settings_fields( $settings_page ); ?>
+	<?php endif; ?>
 
-			<?php do_settings_sections( $settings_page ); ?>
+		<div class="buddypress-body">
+			<form action="<?php echo esc_url( $form_action ) ?>" method="post" id="bp-multiblog-mode-settings-page-form">
 
-			<p class="submit">
-				<input type="submit" name="submit" class="button-primary" value="<?php esc_attr_e( 'Save Settings', 'buddypress' ); ?>" />
-			</p>
+				<?php settings_fields( $settings_page ); ?>
 
-		</form>		
+				<?php do_settings_sections( $settings_page ); ?>
+
+				<p class="submit">
+					<input type="submit" name="submit" id="bp-multiblog-mode-settings-page-submit" class="button-primary" value="<?php esc_attr_e( 'Save Settings', 'buddypress' ); ?>" />
+				</p>
+
+			</form>
+		</div>
+
+	<?php if ( ! $is_tabbed_header ) : ?>
+
 	</div>
 
-	<?php
+	<?php endif;
 }
 
 /**
