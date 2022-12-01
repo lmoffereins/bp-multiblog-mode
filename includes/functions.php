@@ -362,18 +362,18 @@ function bp_multiblog_mode_get_upload_dir( $site_id = 0 ) {
 }
 
 /**
- * Return whether to filter the avatar upload directory
+ * Return whether to modify the avatar upload directory
  *
  * @since 1.0.0
  *
- * @return bool Filter the avatar upload dir
+ * @return bool Modify the avatar upload dir
  */
-function bp_multiblog_mode_filter_avatar_upload_dir() {
+function bp_multiblog_mode_modify_avatar_upload_dir() {
 	$use_file_uploads   = bp_multiblog_mode_use_root_file_uploads();
 	$use_avatar_uploads = bp_multiblog_mode_use_root_avatar_uploads();
 
 	/**
-	 * Filter avatar upload directory when:
+	 * Modify the avatar upload directory when:
 	 * - Multiblog mode is enabled
 	 * - Upload dir is not overloaded and avatars should use the root dir
 	 * - OR Upload dir *is* overloaded and avatars should *not* use the root dir
@@ -394,8 +394,12 @@ function bp_multiblog_mode_filter_avatar_upload_dir() {
 function bp_multiblog_mode_core_avatar_upload_path( $path ) {
 
 	// Filtering required
-	if ( bp_multiblog_mode_filter_avatar_upload_dir() && ! defined( 'BP_AVATAR_UPLOAD_PATH' ) ) {
-		$uploads = bp_multiblog_mode_get_upload_dir( bp_multiblog_mode_use_root_avatar_uploads() ? bp_multiblog_mode_get_root_blog_id() : 0 );
+	if ( bp_multiblog_mode_modify_avatar_upload_dir() && ! defined( 'BP_AVATAR_UPLOAD_PATH' ) ) {
+		$uploads = bp_multiblog_mode_get_upload_dir(
+			bp_multiblog_mode_use_root_avatar_uploads()
+				? bp_multiblog_mode_get_root_blog_id()
+				: 0
+		);
 
 		if ( $uploads ) {
 			$path = $uploads['basedir'];
@@ -416,8 +420,12 @@ function bp_multiblog_mode_core_avatar_upload_path( $path ) {
 function bp_multiblog_mode_core_avatar_url( $url ) {
 
 	// Filtering required
-	if ( bp_multiblog_mode_filter_avatar_upload_dir() && ! defined( 'BP_AVATAR_URL' ) ) {
-		$uploads = bp_multiblog_mode_get_upload_dir( bp_multiblog_mode_use_root_avatar_uploads() ? bp_multiblog_mode_get_root_blog_id() : 0 );
+	if ( bp_multiblog_mode_modify_avatar_upload_dir() && ! defined( 'BP_AVATAR_URL' ) ) {
+		$uploads = bp_multiblog_mode_get_upload_dir(
+			bp_multiblog_mode_use_root_avatar_uploads()
+				? bp_multiblog_mode_get_root_blog_id()
+				: 0
+		);
 
 		if ( $uploads ) {
 			$url = $uploads['baseurl'];
