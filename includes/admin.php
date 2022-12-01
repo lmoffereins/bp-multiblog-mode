@@ -346,7 +346,7 @@ class BP_Multiblog_Mode_Admin {
 								<strong>&mdash; <?php esc_html_e( 'Main Site', 'bp-multiblog-mode' ); ?></strong>
 							<?php endif; ?>
 
-							<span class="description"><?php echo $site->siteurl; ?></span>
+							<span class="description"><?php echo $site->domain; ?></span>
 						</label>
 					</li>
 					<?php endforeach; ?>
