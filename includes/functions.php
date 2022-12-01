@@ -52,6 +52,8 @@ function bp_multiblog_mode_is_root_blog( $site_id = 0 ) {
  *
  * @since 1.0.0
  *
+ * @uses apply_filters() Calls 'bp_multiblog_mode_is_enabled'
+ *
  * @param int $site_id Optional. Site id. Defaults to the current site id.
  * @return bool Is Multiblog mode enabled?
  */
@@ -63,45 +65,58 @@ function bp_multiblog_mode_is_enabled( $site_id = 0 ) {
 	}
 
 	// Define return value
-	$retval = false;
+	$is_enabled = false;
 
 	// Check the site's setting when BP is network activated, but not for the real root blog
 	if ( bp_is_network_activated() && ! bp_multiblog_mode_is_root_blog( $site_id ) ) {
-		$retval = (bool) get_blog_option( $site_id, '_bp_multiblog_mode_enabled', false );
+		$is_enabled = (bool) get_blog_option( $site_id, '_bp_multiblog_mode_enabled', false );
 	}
 
-	return $retval;
+	/**
+	 * Filter whether Multiblog is enabled for the site
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param bool $is_enabled Is Multiblog enabled
+	 * @param int $site_id Site id
+	 */
+	return apply_filters( 'bp_multiblog_mode_is_enabled', $is_enabled, $site_id );
 }
 
 /**
- * Return the sites of the current network
+ * Return the sites of the network
  *
  * @since 1.0.0
  *
- * @param bool $enabled Optional. Whether to return only enabled sites. Defaults to false.
+ * @uses apply_filters() Calls 'bp_multiblog_mode_get_sites'
+ *
+ * @param array $query_args {
+ *    Optional. Query arguments for WP_Site_Query.
+ *
+ *    @type bool $multiblog  Whether to return only Multiblog enabled sites.
+ * }
  * @return array Sites, maybe only enabled
  */
-function bp_multiblog_mode_get_sites( $args = array() ) {
+function bp_multiblog_mode_get_sites( $query_args = array() ) {
 
 	// Provide a fallback for non-array parameter
-	if ( ! is_array( $args ) ) {
-		$args = array( 'multiblog' => (bool) $args );
+	if ( ! is_array( $query_args ) ) {
+		$query_args = array( 'multiblog' => (bool) $query_args );
 	}
 
 	// Define query args
-	$args = wp_parse_args( $args, array(
+	$query_args = wp_parse_args( $query_args, array(
 		'network_id' => get_network()->id,
 		'multiblog'  => false
 	) );
 
 	// Query Multiblog-only?
-	$multiblog = (bool) $args['multiblog'];
-	unset( $args['multiblog'] );
+	$multiblog = (bool) $query_args['multiblog'];
 
 	// Get the Network's sites
-	$sites = get_sites( $args );
+	$sites = get_sites( $query_args );
 
-	// Filter for enabled Multiblog sites
+	// Filter for Multiblog enabled sites
 	if ( $multiblog ) {
 		foreach ( $sites as $k => $site ) {
 			
@@ -112,22 +127,35 @@ function bp_multiblog_mode_get_sites( $args = array() ) {
 		}
 	}
 
-	return $sites;
+	/**
+	 * Filter the sites of the network
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $sites Sites
+	 * @param array $query_args Query arguments for WP_Site_Query
+	 */
+	return apply_filters( 'bp_multiblog_mode_get_sites', $sites, $query_args );
 }
 
 /**
- * Return the Multiblog enabled sites of the current network
+ * Return the Multiblog enabled sites of the network
  *
  * @see bp_multiblog_mode_get_sites()
  *
  * @since 1.0.0
  *
- * @param array Optional. Query arguments for WP_Site_Query.
+ * @param array $query_args Optional. See {@see bp_multiblog_mode_get_sites()}.
  * @return array Multiblog enabled sites
  */
-function bp_multiblog_mode_get_enabled_sites( $args = array() ) {
-	$args = wp_parse_args( $args, array( 'multiblog' => true ) );
-	return bp_multiblog_mode_get_sites( $args );
+function bp_multiblog_mode_get_enabled_sites( $query_args = array() ) {
+
+	// Parse defaults
+	$query_args = wp_parse_args( $query_args, array(
+		'multiblog' => true
+	) );
+
+	return bp_multiblog_mode_get_sites( $query_args );
 }
 
 /**
@@ -135,10 +163,19 @@ function bp_multiblog_mode_get_enabled_sites( $args = array() ) {
  *
  * @since 1.0.0
  *
- * @return bool Using root's taxonomy terms?
+ * @return bool Use root taxonomy terms
  */
 function bp_multiblog_mode_use_root_taxonomy_terms() {
-	return ! get_option( '_bp_multiblog_mode_taxonomy_terms', false );
+	$use_root_taxonomy_terms = ! get_option( '_bp_multiblog_mode_taxonomy_terms', false );
+
+	/**
+	 * Filter whether to use the root's taxonomy terms
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param bool $use_root_taxonomy_terms Use the root's taxonomy terms
+	 */
+	return (bool) apply_filters( 'bp_multiblog_mode_use_root_taxonomy_terms', $use_root_taxonomy_terms );
 }
 
 /** Activity ************************************************************/
@@ -277,10 +314,21 @@ function bp_multiblog_mode_xprofile_get_groups( $groups, $args ) {
  *
  * @since 1.0.0
  *
+ * @uses apply_filters() Calls 'bp_multiblog_mode_use_root_avatar_uploads'
+ *
  * @return bool Use root avatar uploads
  */
 function bp_multiblog_mode_use_root_avatar_uploads() {
-	return ! get_option( '_bp_multiblog_mode_avatar_uploads', false );
+	$use_root_avatar_uploads = ! get_option( '_bp_multiblog_mode_avatar_uploads', false );
+
+	/**
+	 * Filter whether to use the root's avatar uploads
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param bool $use_root_avatar_uploads Use the root's avatar uploads
+	 */
+	return (bool) apply_filters( 'bp_multiblog_mode_use_root_avatar_uploads', $use_root_avatar_uploads );
 }
 
 /**
@@ -288,10 +336,21 @@ function bp_multiblog_mode_use_root_avatar_uploads() {
  *
  * @since 1.0.0
  *
+ * @uses apply_filters() Calls 'bp_multiblog_mode_use_root_file_uploads'
+ *
  * @return bool Use root file uploads
  */
 function bp_multiblog_mode_use_root_file_uploads() {
-	return ! get_option( '_bp_multiblog_mode_file_uploads', false );
+	$use_root_file_uploads = ! get_option( '_bp_multiblog_mode_file_uploads', false );
+
+	/**
+	 * Filter whether to use the root's file uploads
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param bool $use_root_file_uploads Use the root's file uploads
+	 */
+	return (bool) apply_filters( 'bp_multiblog_mode_use_root_file_uploads', $use_root_file_uploads );
 }
 
 /**
@@ -304,6 +363,8 @@ function bp_multiblog_mode_use_root_file_uploads() {
  * @see bp_upload_dir()
  *
  * @since 1.0.0
+ *
+ * @uses do_action() Calls 'bp_multiblog_mode_set_root_upload_dir'
  */
 function bp_multiblog_mode_set_root_upload_dir() {
 	$bp = buddypress();
@@ -325,13 +386,22 @@ function bp_multiblog_mode_set_root_upload_dir() {
 		}
 
 		$bp->upload_dir = $wp_upload_dir;
+
+		/**
+		 * Act after BP's upload directory is changed to BP's root upload directory
+		 *
+		 * @since 1.0.0
+		 */
+		do_action( 'bp_multiblog_mode_set_root_upload_dir' );
 	}
 }
 
 /**
- * Return the upload dir for the BP's root blog
+ * Return the upload dir for the given site
  *
  * @since 1.0.0
+ *
+ * @uses apply_filters() Calls 'bp_multiblog_mode_get_upload_dir'
  *
  * @param int $site_id Optional. Site id. Defaults to the current site id.
  * @return array Root upload dir data
@@ -358,7 +428,15 @@ function bp_multiblog_mode_get_upload_dir( $site_id = 0 ) {
 		$plugin->upload_dir = $upload_dir;
 	}
 
-	return $plugin->upload_dir;
+	/**
+	 * Filter the site's upload directory
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param bool $upload_dir The site's upload directory
+	 * @param int $site_id Site id
+	 */
+	return apply_filters( 'bp_multiblog_mode_get_upload_dir', $plugin->upload_dir, $site_id );
 }
 
 /**
