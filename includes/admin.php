@@ -100,14 +100,17 @@ class BP_Multiblog_Mode_Admin {
 			'bp_multiblog_mode_admin_settings_page'
 		);
 
-		$submenu_pages['settings']['bp-multiblog-mode'] = $settings_page;
-		$hooks[]                                        = $settings_page;
+		$hooks[] = $settings_page;
 
 		// Blend in BP's administration
 		foreach ( $hooks as $hook ) {
 			add_action( "admin_head-{$hook}", 'bp_core_modify_admin_menu_highlight' );
 		}
 
+		// Add to navigation tabs
+		if ( isset( $submenu_pages['settings'] ) ) {
+			$submenu_pages['settings']['bp-multiblog-mode'] = $settings_page;
+		}
 	}
 
 	/**
