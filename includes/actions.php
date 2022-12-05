@@ -19,6 +19,13 @@ add_action( 'bp_admin_init', 'bp_multiblog_mode_admin_init' );
 
 add_filter( 'bp_activity_get_where_conditions', 'bp_multiblog_mode_activity_limit_stream', 10, 5 );
 
+/** Members *************************************************************/
+
+add_filter( 'bp_core_set_uri_globals_member_slug', 'bp_multiblog_mode_members_block_profile'            );
+add_filter( 'bp_user_query_uid_clauses',           'bp_multiblog_mode_members_limit_users',       10, 2 );
+add_filter( 'bp_core_get_total_member_count',      'bp_multiblog_mode_limit_total_member_count'         );
+add_filter( 'bp_core_get_active_member_count',     'bp_multiblog_mode_limit_active_member_count'        );
+
 /** XProfile ************************************************************/
 
 add_filter( 'bp_xprofile_get_groups', 'bp_multiblog_mode_xprofile_get_groups', 10, 2 );

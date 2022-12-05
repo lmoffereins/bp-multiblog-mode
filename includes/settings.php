@@ -72,6 +72,14 @@ function bp_multiblog_mode_admin_get_settings_fields() {
 		// General settings		
 		'bp_multiblog_mode_settings_general' => array(
 
+			// Members
+			'_bp_multiblog_mode_site_members' => array(
+				'title'             => esc_html__( 'Members', 'bp-multiblog-mode' ),
+				'callback'          => 'bp_multiblog_mode_admin_setting_callback_site_members',
+				'sanitize_callback' => 'intval',
+				'args'              => array()
+			),
+
 			// Taxonomy terms
 			'_bp_multiblog_mode_taxonomy_terms' => array(
 				'title'             => esc_html__( 'Taxonomy terms', 'bp-multiblog-mode' ),
@@ -114,11 +122,14 @@ function bp_multiblog_mode_admin_get_settings_fields() {
 			'args'              => array()
 		);
 
-		// Site Members
-		$fields['bp_multiblog_mode_settings_general']['_bp_multiblog_mode_site_members'] = array(
-			'sanitize_callback' => 'intval',
-			'args'              => array()
-		);
+		// Activity Stream Site Members
+		if ( ! bp_multiblog_mode_limit_site_members() ) {
+			$fields['bp_multiblog_mode_settings_general']['_bp_multiblog_mode_activity_site_members'] = array(
+				/* Field input is in the 'Activity stream' setting */
+				'sanitize_callback' => 'intval',
+				'args'              => array()
+			);
+		}
 	}
 
 	// Avatar uploads is disabled
@@ -270,20 +281,7 @@ function bp_multiblog_mode_admin_setting_callback_sites() {
  */
 function bp_multiblog_mode_admin_setting_callback_general_section() { ?>
 
-	<p><?php esc_html_e( "Initially, this  site's instance of BuddyPress is an identical presentation of the one at the root site. However, the settings below enable you to further tweak its unique presentation on this site.", 'bp-multiblog-mode' ); ?></p>
-
-	<?php
-}
-
-/**
- * Display the Taxonomy terms setting field
- *
- * @since 1.0.0
- */
-function bp_multiblog_mode_admin_setting_callback_taxonomy_terms() { ?>
-
-	<input value="1" type="checkbox" name="_bp_multiblog_mode_taxonomy_terms" id="_bp_multiblog_mode_taxonomy_terms" <?php checked( bp_get_form_option( '_bp_multiblog_mode_taxonomy_terms', false ) ); ?> />
-	<label for="_bp_multiblog_mode_taxonomy_terms"><?php esc_html_e( "Register BuddyPress taxonomy terms and term relationships (like member types) on this site. Defaults to using the root's taxonomy terms.", 'bp-multiblog-mode' ); ?></label>
+	<p><?php esc_html_e( 'Initially the instance of BuddyPress on this site is an identical representation of the one at the root site. However, the settings below provide options to modify the distinct variation on this site.', 'bp-multiblog-mode' ); ?></p>
 
 	<?php
 }
@@ -296,7 +294,20 @@ function bp_multiblog_mode_admin_setting_callback_taxonomy_terms() { ?>
 function bp_multiblog_mode_admin_setting_callback_site_members() { ?>
 
 	<input value="1" type="checkbox" name="_bp_multiblog_mode_site_members" id="_bp_multiblog_mode_site_members" <?php checked( bp_get_form_option( '_bp_multiblog_mode_site_members', false ) ); ?> />
-	<label for="_bp_multiblog_mode_site_members"><?php esc_html_e( "Limit this site's instance of BuddyPress to members who are registered users of this site", 'bp-multiblog-mode' ); ?></label>
+	<label for="_bp_multiblog_mode_site_members"><?php esc_html_e( 'Limit the implementation of BuddyPress to site members only.', 'bp-multiblog-mode' ); ?></label>
+
+	<?php
+}
+
+/**
+ * Display the Taxonomy terms setting field
+ *
+ * @since 1.0.0
+ */
+function bp_multiblog_mode_admin_setting_callback_taxonomy_terms() { ?>
+
+	<input value="1" type="checkbox" name="_bp_multiblog_mode_taxonomy_terms" id="_bp_multiblog_mode_taxonomy_terms" <?php checked( bp_get_form_option( '_bp_multiblog_mode_taxonomy_terms', false ) ); ?> />
+	<label for="_bp_multiblog_mode_taxonomy_terms"><?php esc_html_e( 'Use BuddyPress taxonomies (like member types) on this site instead of those from the network.', 'bp-multiblog-mode' ); ?></label>
 
 	<?php
 }
@@ -315,12 +326,14 @@ function bp_multiblog_mode_admin_setting_callback_activity_stream() { ?>
 		<label for="_bp_multiblog_mode_activity_stream"><?php esc_html_e( 'Items that are created on this site', 'bp-multiblog-mode' ); ?></label>
 	</p>
 
+	<?php if ( ! bp_multiblog_mode_limit_site_members() ) : ?>
+
 	<p>
-		<input value="1" type="checkbox" name="_bp_multiblog_mode_site_members" id="_bp_multiblog_mode_site_members" <?php checked( bp_get_form_option( '_bp_multiblog_mode_site_members', false ) ); ?> />
-		<label for="_bp_multiblog_mode_site_members"><?php esc_html_e( 'Items that are created by members who are a user of this site', 'bp-multiblog-mode' ); ?></label>
+		<input value="1" type="checkbox" name="_bp_multiblog_mode_activity_site_members" id="_bp_multiblog_mode_activity_site_members" <?php checked( bp_get_form_option( '_bp_multiblog_mode_activity_site_members', false ) ); ?> />
+		<label for="_bp_multiblog_mode_activity_site_members"><?php esc_html_e( 'Items that are created by site members', 'bp-multiblog-mode' ); ?></label>
 	</p>
 
-	<?php
+	<?php endif;
 }
 
 /** Profile Section ***********************************************************/

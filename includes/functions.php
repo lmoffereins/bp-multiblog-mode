@@ -178,7 +178,261 @@ function bp_multiblog_mode_use_root_taxonomy_terms() {
 	return (bool) apply_filters( 'bp_multiblog_mode_use_root_taxonomy_terms', $use_root_taxonomy_terms );
 }
 
+/**
+ * Return the given site's user ids
+ *
+ * @since 1.0.0
+ *
+ * @uses apply_filters() Calls 'bp_multiblog_mode_get_site_users'
+ *
+ * @param int $site_id Optional. Site ID. Defaults to the current site.
+ * @param array $query_args Optional. Additional query arguments for `WP_User_Query`.
+ * @return array Site user ids
+ */
+function bp_multiblog_mode_get_site_users( $site_id = 0, $query_args = array() ) {
+
+	// Define user query args
+	$query_args = wp_parse_args( $query_args, array( 'fields' => 'ids' ) );
+
+	// Site id default is set in `WP_User_Query`
+	if ( ! empty( $site_id ) ) {
+		$query_args['blog_id'] = (int) $site_id;
+	}
+
+	$users = get_users( $query_args );
+
+	/**
+	 * Filter the site's users
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $users Site user ids
+	 * @param int $site_id Site id
+	 * @param array $query_args Arguments for `WP_User_Query`
+	 */
+	return apply_filters( 'bp_multiblog_mode_get_site_users', $users, $site_id, $query_args );
+}
+
+/**
+ * Return the given site's user count
+ *
+ * @since 1.0.0
+ *
+ * @param int $site_id Optional. Site ID. Defaults to the current site.
+ * @param array $query_args Optional. Additional query arguments for `WP_User_Query`.
+ * @return int Site user count
+ */
+function bp_multiblog_mode_get_site_total_user_count( $site_id = 0, $query_args = array() ) {
+
+	// Define user query args
+	$query_args = wp_parse_args( $query_args, array( 'count_total' => true ) );
+
+	// Site id default is set in `WP_User_Query`
+	if ( ! empty( $site_id ) ) {
+		$query_args['blog_id'] = (int) $site_id;
+	}
+
+	$user_search = new WP_User_Query( $query_args );
+
+	return $user_search->get_results();
+}
+
+/** Members *************************************************************/
+
+/**
+ * Return whether to limit BP content to site members
+ *
+ * @since 1.0.0
+ *
+ * @uses apply_filters() Calls 'bp_multiblog_mode_site_members'
+ *
+ * @return bool Limit content to site members
+ */
+function bp_multiblog_mode_limit_site_members() {
+	$site_members = get_option( '_bp_multiblog_mode_site_members', false );
+
+	/**
+	 * Filter whether to limit BP content to site members
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param bool $site_members Limit content to site members
+	 */
+	return (bool) apply_filters( 'bp_multiblog_mode_site_members', $site_members );
+}
+
+/**
+ * Block member profiles of non-site members
+ *
+ * @since 1.0.0
+ *
+ * @param string $member_slug Member slug
+ * @return string Member slug
+ */
+function bp_multiblog_mode_members_block_profile( $member_slug ) {
+
+	// Block access to profiles of non-site members
+	if ( bp_multiblog_mode_limit_site_members() ) {
+
+		// Get the queried user
+		$field = bp_is_username_compatibility_mode() ? 'login' : 'slug';
+		$user  = get_user_by( $field, $member_slug );
+
+		// Get the site members
+		$site_members = array_map( 'intval', bp_multiblog_mode_get_site_users() );
+
+		// The queried user is not a site member
+		if ( $user && ! in_array( $user->ID, $site_members, true ) ) {
+
+			// Mock a non-existing user slug because a falsey value will result in
+			// a failed page request unaccounted for in `bp_core_set_uri_globals()`
+			$member_slug = '___BP_MULTIBLOG_MODE___';
+		}
+	}
+
+	return $member_slug;
+}
+
+/**
+ * Modify the members query SQL clauses
+ *
+ * @since 1.0.0
+ *
+ * @param array $sql SQL clauses
+ * @param BP_User_Query $query Members query
+ * @return array SQL clauses
+ */
+function bp_multiblog_mode_members_limit_users( $sql, $query ) {
+
+	// Force limit member query results to users of the current site
+	if ( bp_multiblog_mode_limit_site_members() ) {
+
+		// Get the site members
+		$site_members = implode( ',', bp_multiblog_mode_get_site_users() );
+
+		// The queried user(s) should be a site member
+		$sql['where']['bp_multiblog_mode_limit_site_members'] = "u.{$query->uid_name} IN ({$site_members})";
+	}
+
+	return $sql;
+}
+
+/**
+ * Modify the total site member count
+ *
+ * @see bp_core_get_total_member_count()
+ *
+ * @since 1.0.0
+ *
+ * @param int $count Site member count
+ * @return int Site member count
+ */
+function bp_multiblog_mode_limit_total_member_count( $count ) {
+	global $wpdb;
+
+	// Recount total site member count
+	if ( bp_multiblog_mode_limit_site_members() ) {
+
+		// Get the site members
+		$site_members = implode( ',', bp_multiblog_mode_get_site_users() );
+
+		// The queried user(s) should be a site member
+		$status_sql = bp_core_get_status_sql();
+		$count      = $wpdb->get_var( "SELECT COUNT(ID) FROM {$wpdb->users} WHERE {$status_sql} AND {$wpdb->users}.ID IN ({$site_members})" );
+	}
+
+	return $count;
+}
+
+/**
+ * Modify the active site member count
+ *
+ * @see bp_core_get_active_member_count()
+ *
+ * @since 1.0.0
+ *
+ * @param int $count Site member count
+ * @return int Site member count
+ */
+function bp_multiblog_mode_limit_active_member_count( $count ) {
+	global $wpdb;
+
+	// Recount active site member count
+	if ( bp_multiblog_mode_limit_site_members() ) {
+		$bp = buddypress();
+
+		// Get the site members
+		$site_members = implode( ',', bp_multiblog_mode_get_site_users() );
+
+		// Avoid a costly join by splitting the lookup.
+		if ( is_multisite() ) {
+			$sql = "SELECT ID FROM {$wpdb->users} WHERE (user_status != 0 OR deleted != 0 OR user_status != 0)";
+		} else {
+			$sql = "SELECT ID FROM {$wpdb->users} WHERE user_status != 0";
+		}
+
+		// The queried user(s) should be a site member
+		$exclude_users     = $wpdb->get_col( $sql );
+		$exclude_users_sql = !empty( $exclude_users ) ? "AND user_id NOT IN (" . implode( ',', wp_parse_id_list( $exclude_users ) ) . ")" : '';
+		$count             = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(user_id) FROM {$bp->members->table_name_last_activity} WHERE component = %s AND type = 'last_activity' {$exclude_users_sql} AND user_id IN ({$site_members})", $bp->members->id ) );
+	}
+
+	return $count;
+}
+
 /** Activity ************************************************************/
+
+/**
+ * Return whether to limit the activity stream to site items
+ *
+ * This concerns activity items that are created in the context of the site.
+ *
+ * @since 1.0.0
+ *
+ * @return bool Limit activity items to the site
+ */
+function bp_multiblog_mode_activity_limit_site_items() {
+	$limit_site_items = get_option( '_bp_multiblog_mode_activity_stream', false );
+
+	/**
+	 * Filter whether to limit the activity stream to site items
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param bool $limit_site_items Limit activity items to the site
+	 */
+	return (bool) apply_filters( 'bp_multiblog_mode_activity_limit_site_items', $limit_site_items );
+}
+
+/**
+ * Return whether to limit the activity stream to content of site members
+ *
+ * This concerns activity items that are created in the context of the wider network.
+ * It may effect in blocking items that are created by retired/removed site members.
+ *
+ * @since 1.0.0
+ *
+ * @return bool Limit activity items to site members
+ */
+function bp_multiblog_mode_activity_limit_site_members() {
+
+	// Prefer the Site Members setting
+	$limit_site_members = bp_multiblog_mode_limit_site_members();
+
+	// Default to the Activity Site Members setting
+	if ( ! $limit_site_members ) {
+		$limit_site_members = get_option( '_bp_multiblog_mode_activity_limit_site_members', false );
+	}
+
+	/**
+	 * Filter whether to limit the activity stream to content of site members
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param bool $limit_site_members Limit activity items to site members
+	 */
+	return (bool) apply_filters( 'bp_multiblog_mode_activity_limit_site_members', $limit_site_members );
+}
 
 /**
  * Modify the activity query WHERE statements
@@ -201,30 +455,33 @@ function bp_multiblog_mode_activity_limit_stream( $where, $args ) {
 	// Get BuddyPress
 	$bp = buddypress();
 
-	// Only when Multiblog is enabled
-	if ( bp_multiblog_mode_is_enabled() ) {
+	// Exclude activity items from deactivated components, except Blogs
+	$components = array_diff( (array) $bp->deactivated_components, array( 'blogs' ) );
 
-		// Exclude activity items from deactivated components, not Blogs
-		$components = array_diff( (array) $bp->deactivated_components, array( 'blogs' ) );
-		$where['bp_multiblog_mode_deactivated_components'] = sprintf( "a.component NOT IN ( %s )", "'" . implode( "','", $components ) . "'" );
+	if ( $components ) {
+		$components = "'" . implode( "','", $components ) . "'";
+
+		// Activity item(s) should not be from deactivated components
+		$where['bp_multiblog_mode_exclude_deactivated_components'] = "a.component NOT IN ({$components})";
 	}
 
-	// Force return activity items belonging only to the current site
-	if ( bp_get_option( '_bp_multiblog_mode_activity_stream', false ) ) {
-
+	// Limit activity items belonging to the current site
+	if ( bp_multiblog_mode_activity_limit_site_items() ) {
 		/**
 		 * Column 'item_id' can also mean id from activity/forums/groups etc.
 		 * components, so only filter blogs component activities.
 		 */
-		$where['bp_multiblog_mode_current_site'] = $wpdb->prepare( "( a.item_id = %d OR a.component <> %s )", get_current_blog_id(), 'blogs' );
+		$where['bp_multiblog_mode_activity_limit_site_items'] = $wpdb->prepare( "(a.item_id = %d OR a.component <> %s)", get_current_blog_id(), 'blogs' );
 	}
 
-	// Force return activity items created by users of the current site
-	if ( bp_get_option( '_bp_multiblog_mode_site_members', false ) ) {
+	// Limit activity items created by site members
+	if ( bp_multiblog_mode_activity_limit_site_members() ) {
 
-		// `WP_User_Query` defaults to users of the current site
-		$members = get_users( array( 'fields' => 'ids' ) );
-		$where['bp_multiblog_mode_site_members'] = sprintf( "a.user_id IN ( %s )", implode( ',', $members ) );
+		// Get the site members
+		$site_members = implode( ',', bp_multiblog_mode_get_site_users() );
+
+		// Activity item creator(s) should be a site member
+		$where['bp_multiblog_mode_activity_limit_site_members'] = "a.user_id IN ({$site_members})";
 	}
 
 	return $where;
