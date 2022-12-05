@@ -1,16 +1,19 @@
 # BP Multiblog Mode #
 
-Enable and customize BuddyPress on other sites than the root blog.
+Enable and customize BuddyPress on other sites in your network than the root blog.
 
 ## Description ##
 
 > This WordPress plugin requires at least [WordPress](https://wordpress.org) 4.6 and [BuddyPress](https://buddypress.org) 2.7.
 
-Wanting to have BuddyPress run on your subsites, but not all of them? Instead of defining the `BP_ENABLE_MULTIBLOG` constant, with this plugin you can choose on which sites BuddyPress acts like `BP_ENABLE_MULTIBLOG` was defined. In addition, this plugin allows you to:
+Run BuddyPress on your network subsites, but not all of them. Instead of defining the BP_ENABLE_MULTIBLOG constant, with this plugin you can choose on which sites BuddyPress acts as if BP_ENABLE_MULTIBLOG was defined.
 
-* Define Extended Profile field groups per site
+In addition, this plugin allows you to:
+
+* Limit the BuddyPress implementation to site members
 * Limit Activity Stream items to those belonging to the current site
-* [more to come]
+* Define Extended Profile field groups per site
+* Use BuddyPress avatars and/or other file uploads from the current site
 
 Note that you need to have BuddyPress network-activated in your Multisite installation for this plugin to work.
 
@@ -26,4 +29,4 @@ This plugin is not hosted in the official WordPress repository. Instead, updatin
 
 ## Contribution ##
 
-You can contribute to the development of this plugin by [opening a new issue](https://github.com/${3:repo}/${2:the-plugin}/issues/) to report a bug or request a feature in the plugin's GitHub repository.
+You can contribute to the development of this plugin by [opening a new issue](https://github.com/lmoffereins/bp-multiblog-mode/issues/) to report a bug or request a feature in the plugin's GitHub repository.
