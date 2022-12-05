@@ -307,7 +307,7 @@ function bp_multiblog_mode_admin_setting_callback_site_members() { ?>
 function bp_multiblog_mode_admin_setting_callback_taxonomy_terms() { ?>
 
 	<input value="1" type="checkbox" name="_bp_multiblog_mode_taxonomy_terms" id="_bp_multiblog_mode_taxonomy_terms" <?php checked( bp_get_form_option( '_bp_multiblog_mode_taxonomy_terms', false ) ); ?> />
-	<label for="_bp_multiblog_mode_taxonomy_terms"><?php esc_html_e( 'Use BuddyPress taxonomies (like member types) on this site instead of those from the network.', 'bp-multiblog-mode' ); ?></label>
+	<label for="_bp_multiblog_mode_taxonomy_terms"><?php esc_html_e( 'Use BuddyPress taxonomies (like member types) on this site instead of using those from the network.', 'bp-multiblog-mode' ); ?></label>
 
 	<?php
 }
@@ -353,7 +353,7 @@ function bp_multiblog_mode_admin_setting_callback_profile_section() { /* Nothing
 function bp_multiblog_mode_admin_setting_callback_avatar_uploads() { ?>
 
 	<input value="1" type="checkbox" name="_bp_multiblog_mode_avatar_uploads" id="_bp_multiblog_mode_avatar_uploads" <?php checked( bp_get_form_option( '_bp_multiblog_mode_avatar_uploads', false ) ); ?> />
-	<label for="_bp_multiblog_mode_avatar_uploads"><?php esc_html_e( 'Store avatar uploads on this site. Defaults to using root avatars.', 'bp-multiblog-mode' ); ?></label>
+	<label for="_bp_multiblog_mode_avatar_uploads"><?php esc_html_e( 'Store avatar uploads on this site instead of in the network avatar uploads directory.', 'bp-multiblog-mode' ); ?></label>
 
 	<?php
 }
@@ -366,7 +366,7 @@ function bp_multiblog_mode_admin_setting_callback_avatar_uploads() { ?>
 function bp_multiblog_mode_admin_setting_callback_file_uploads() { ?>
 
 	<input value="1" type="checkbox" name="_bp_multiblog_mode_file_uploads" id="_bp_multiblog_mode_file_uploads" <?php checked( bp_get_form_option( '_bp_multiblog_mode_file_uploads', false ) ); ?> />
-	<label for="_bp_multiblog_mode_file_uploads"><?php esc_html_e( 'Store non-avatar file uploads on this site. Defaults to using root file uploads.', 'bp-multiblog-mode' ); ?></label>
+	<label for="_bp_multiblog_mode_file_uploads"><?php esc_html_e( 'Store member file uploads on this site instead of in the network uploads directory.', 'bp-multiblog-mode' ); ?></label>
 
 	<?php
 }
