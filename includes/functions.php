@@ -11,23 +11,23 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Return the real root blog ID where BP actually lives
+ * Return the actual root blog ID where BP actually lives
  *
  * @since 1.0.0
  *
- * @return int The real BP root blog ID
+ * @return int The actual BP root blog ID
  */
 function bp_multiblog_mode_get_root_blog_id() {
 	return bp_multiblog_mode()->root_blog_id;
 }
 
 /**
- * Return whether the given site is the real BP root blog
+ * Return whether the given site is the actual BP root blog
  *
  * @since 1.0.0
  *
  * @param int $site_id Optional. Site id. Defaults to the current site id.
- * @return bool Is this the real BP root blog?
+ * @return bool Is this the actual BP root blog?
  */
 function bp_multiblog_mode_is_root_blog( $site_id = 0 ) {
 
@@ -39,7 +39,7 @@ function bp_multiblog_mode_is_root_blog( $site_id = 0 ) {
 	// Define return value
 	$retval = false;
 
-	// Check the real root blog ID
+	// Check the actual root blog ID
 	if ( bp_multiblog_mode_get_root_blog_id() === (int) $site_id ) {
 		$retval = true;
 	}
